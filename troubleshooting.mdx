@@ -1,0 +1,134 @@
+---
+title: "Troubleshoot Common LeadRev Issues and Error Codes"
+sidebarTitle: "Troubleshooting"
+description: "Diagnose and fix common problems in LeadRev including CSV import errors, CRM sync failures, missing leads, notification issues, and API errors."
+---
+
+If something isn't working as expected in LeadRev, this guide covers the most common issues and how to resolve them. Work through the steps for your issue — most problems can be fixed without contacting support.
+
+<AccordionGroup>
+
+  <Accordion title="CSV import fails with field mapping errors">
+    Field mapping errors occur when LeadRev can't match the columns in your file to the required lead fields, or when a required field is missing or malformatted.
+
+    **Steps to resolve:**
+
+    1. **Re-download the import template.** Go to **Leads → Import → Download Template** and use the latest version. Column headers must match exactly — do not rename or reorder them.
+    2. **Verify the three required fields are present and populated:** `name`, `owner`, and `stage`. Every row must have a value for all three. Blank cells in required columns cause the entire import to fail.
+    3. **Check your date format.** The `last_contact_date` field and any other date columns must use ISO 8601 format: `YYYY-MM-DD` (for example, `2024-11-15`). Formats like `11/15/2024` or `Nov 15, 2024` are not accepted.
+    4. **Check the `stage` values.** Each value in the `stage` column must exactly match a stage name configured in your workspace. Go to **Settings → Pipeline → Stages** to see the valid stage names. Capitalization matters.
+    5. **Review the error report.** After a failed import, LeadRev displays a downloadable error report listing each row and the specific field that caused the failure. Use this to fix only the affected rows before re-uploading.
+
+    If the import continues to fail after following these steps, try importing a small batch of five rows to isolate the problematic data.
+  </Accordion>
+
+  <Accordion title="Leads are not appearing in the Recovery Queue">
+    If leads you expect to see in the Recovery Queue are absent, there are a few likely causes.
+
+    **Steps to resolve:**
+
+    1. **Confirm the lead has a deal value set.** Leads without a `deal_value` are tracked but not factored into pipeline at risk calculations. While they do still appear in the queue if they cross the risk threshold, confirm the field is populated on the affected leads.
+    2. **Check your current risk thresholds.** Navigate to **Settings → Risk & Thresholds** and verify the At Risk threshold. If it has been set unusually high — for example, 60 days — many leads will still score as Healthy. Compare the threshold against the last contact date of the leads you expect to see.
+    3. **Check the lead's health score directly.** Open the lead's detail page and review the health score and current tier. If the lead is Healthy, the score breakdown will show you which factors are keeping it above the threshold.
+    4. **Verify the lead is active.** Leads marked as Closed Lost, Disqualified, or Won are excluded from the Recovery Queue. Check the lead's status field.
+    5. **Check your queue filter.** The Recovery Queue supports filters by owner, stage, and tier. If a filter is active, some leads may be hidden. Click **Clear Filters** to see the full queue.
+  </Accordion>
+
+  <Accordion title="Health score is not updating after logging a contact">
+    Health scores recalculate automatically within two minutes of any contact activity being logged. If the score appears stale, try the following:
+
+    1. **Hard refresh the page.** Press `Ctrl + Shift + R` (Windows/Linux) or `Cmd + Shift + R` (Mac) to bypass the browser cache and load the latest data.
+    2. **Wait up to five minutes.** During periods of high activity, recalculation may take slightly longer than usual. Wait five minutes after logging the activity before concluding there is a problem.
+    3. **Verify the activity was saved.** Open the lead's **Activity** tab and confirm the logged contact appears in the timeline. If it's not there, the activity may not have been submitted successfully — try logging it again.
+    4. **Check the activity type.** Only contact activities — Call, Email, and Meeting — reset the contact recency clock. Notes and internal comments do not affect the health score.
+
+    If the score is still showing the old value more than five minutes after a confirmed activity log, contact LeadRev support at support@leadrev.ai with the lead ID and the timestamp of the logged activity.
+  </Accordion>
+
+  <Accordion title="CRM sync is not pulling new leads">
+    If new leads created in Salesforce or HubSpot are not appearing in LeadRev, work through these checks:
+
+    1. **Verify the integration is still authenticated.** Go to **Settings → Integrations** and check the status of your CRM integration. If it shows a yellow or red status indicator, the OAuth token has expired or been revoked. Click **Reconnect** and complete the authentication flow again.
+    2. **Check the sync frequency setting.** If you're using hourly sync, new records appear in LeadRev within 60 minutes of being created in your CRM — not immediately. Switch to real-time sync if you need faster propagation (Salesforce only; requires the LeadRev app installed in your org).
+    3. **Review the sync error log.** Go to **Settings → Integrations → [Salesforce or HubSpot] → Sync Log**. Any records that failed to sync are listed here with a reason. Common causes include missing required fields in the CRM record (name, stage) or field mapping mismatches.
+    4. **Check field mapping.** If you've recently added custom fields to your CRM, the mapping may need to be updated. Go to **Settings → Integrations → [CRM] → Field Mapping** and verify all required LeadRev fields are mapped to valid CRM fields.
+    5. **Trigger a manual sync.** From the integration settings page, click **Sync Now** to force an immediate pull. This is useful for confirming whether the issue is with real-time sync specifically or with the integration overall.
+  </Accordion>
+
+  <Accordion title="Notifications are not being received">
+    If you're not receiving LeadRev notifications through email, in-app, or Slack, follow these steps:
+
+    **For email notifications:**
+    1. Check your **spam or junk folder**. LeadRev sends notifications from `notifications@leadrev.ai` — add this address to your allowlist.
+    2. Verify the notification type is enabled in your account. Go to **Avatar → Notification Settings** and confirm the relevant notification is toggled on and the delivery channel includes Email.
+    3. Confirm your account email address is correct in **Avatar → Profile Settings**.
+
+    **For in-app notifications:**
+    1. Click the bell icon in the top navigation bar. In-app notifications accumulate there — they don't produce browser push notifications unless you've explicitly enabled browser permissions for LeadRev.
+    2. Verify the notification type is enabled and set to **In-App** or **Both** in your Notification Settings.
+
+    **For Slack notifications:**
+    1. Verify the Slack integration is still connected at **Settings → Integrations → Slack**.
+    2. Confirm the LeadRev bot has permission to post to the configured channel. If the channel is private, the bot must be explicitly invited with `/invite @LeadRev`.
+    3. Check that the event is mapped to a Slack channel in **Settings → Integrations → Slack → Channel Routing**.
+  </Accordion>
+
+  <Accordion title="API returning 401 Unauthorized">
+    A `401 Unauthorized` response means the server could not authenticate your request. This is almost always a credential issue.
+
+    **Steps to resolve:**
+
+    1. **Verify your API key is correct.** Copy the key directly from **Settings → API → API Keys** rather than typing it manually. Even a single misplaced character will cause a 401.
+    2. **Check that the key hasn't been revoked.** If a key shows as **Inactive** in the API Keys list, it has been revoked and cannot be used. Generate a new key and update your integration.
+    3. **Confirm the Authorization header format.** LeadRev requires Bearer token authentication. Your request header must be formatted exactly as:
+
+    ```bash
+    Authorization: Bearer YOUR_API_KEY
+    ```
+
+    Do not use Basic auth or pass the key as a query parameter — these formats are not supported.
+
+    4. **Verify the key has the correct permission scope.** Read-only API keys cannot perform write operations (POST, PATCH, DELETE). If your request involves creating or updating a resource, ensure the key was generated with write permissions.
+  </Accordion>
+
+  <Accordion title="API returning 429 Too Many Requests">
+    A `429 Too Many Requests` response means your integration has exceeded the rate limit of **60 requests per minute** for your API key.
+
+    **Steps to resolve:**
+
+    1. **Respect the `Retry-After` header.** The `429` response includes a `Retry-After` header with the number of seconds to wait before retrying. Honor this value before making additional requests.
+
+    2. **Implement exponential backoff.** Rather than retrying at a fixed interval, use exponential backoff with jitter:
+
+    ```javascript
+    async function fetchWithBackoff(url, options, retries = 5) {
+      for (let attempt = 0; attempt < retries; attempt++) {
+        const response = await fetch(url, options);
+        if (response.status !== 429) return response;
+        const retryAfter = response.headers.get('Retry-After') || Math.pow(2, attempt);
+        await new Promise(resolve => setTimeout(resolve, retryAfter * 1000));
+      }
+      throw new Error('Rate limit exceeded after maximum retries');
+    }
+    ```
+
+    3. **Reduce request frequency.** Batch operations where possible. For example, if you're polling for lead updates, use the `updated_since` query parameter to fetch only changed records rather than the full list.
+
+    4. **Request a higher limit.** If your use case legitimately requires more than 60 requests per minute — for example, a large-scale sync or a real-time dashboard — contact LeadRev support at support@leadrev.ai to request a rate limit increase for your workspace.
+  </Accordion>
+
+  <Accordion title="Webhook events not being received">
+    If your endpoint is registered but not receiving LeadRev webhook payloads, work through the following:
+
+    1. **Verify the endpoint is publicly accessible.** LeadRev cannot reach `localhost` or internal network addresses. Your endpoint must be reachable over the public internet via HTTPS. Use a tool like [webhook.site](https://webhook.site) to confirm the URL accepts incoming requests.
+    2. **Confirm the endpoint returns a 2xx response.** LeadRev considers a delivery successful only when your endpoint responds with an HTTP status code in the `200–299` range. If your endpoint returns a `3xx`, `4xx`, or `5xx`, LeadRev marks the delivery as failed and retries up to three times with exponential backoff.
+    3. **Check the webhook delivery log.** Go to **Settings → Integrations → Webhooks**, click your endpoint, and open the **Delivery Log** tab. Each delivery attempt is listed with its timestamp, event type, response status, and response body. Use this log to identify whether deliveries are being attempted and what your endpoint is returning.
+    4. **Verify the events are selected.** Open the endpoint configuration and confirm the event types you expect to receive are checked. Events that are not selected for an endpoint will never be delivered to it.
+    5. **Validate your signature verification code.** If your endpoint is rejecting requests due to a signature mismatch, double-check that you're computing the HMAC-SHA256 signature over the raw request body (not parsed JSON) using the endpoint secret shown in the LeadRev UI.
+  </Accordion>
+
+</AccordionGroup>
+
+<Note>
+  For issues not covered here, contact LeadRev support at **support@leadrev.ai** or use the in-app chat (click the speech bubble icon in the bottom-right corner of any page). Include your workspace ID, the affected lead or integration name, and a description of what you expected versus what happened — this helps the support team resolve your issue faster.
+</Note>

@@ -1,0 +1,224 @@
+---
+title: "Contacts API: Log and Retrieve Lead Contact Activities"
+sidebarTitle: "Contacts"
+description: "API endpoints for logging call, email, and meeting activities on leads and retrieving contact history to keep LeadRev health scores current."
+---
+
+The Contacts endpoints let you log touchpoints — calls, emails, meetings — on leads programmatically and retrieve the full contact history for any lead. Logging a contact updates the lead's health score immediately, so your risk data stays accurate whether your team logs activity directly in LeadRev or through your own tools and CRM integrations.
+
+---
+
+## POST /v1/contacts — Log a Contact Activity
+
+Creates a new contact activity record on a lead and triggers an immediate health score recalculation. Use this endpoint to sync activity from your CRM, dialer, or email platform so LeadRev always reflects your team's real engagement.
+
+<Tip>
+  If you log a contact and also want to update the lead's next step in a single workflow, include `next_step` and `next_step_due` in the request body. Both fields are written to the parent lead record automatically.
+</Tip>
+
+### Request Body
+
+<ParamField body="lead_id" type="string" required>
+  The LeadRev ID of the lead this activity is being logged against.
+</ParamField>
+
+<ParamField body="type" type="string" required>
+  The type of contact activity. Accepted values: `call`, `email`, `meeting`, or `other`.
+</ParamField>
+
+<ParamField body="date" type="string" required>
+  ISO 8601 date of the contact (e.g. `2024-11-22`). Defaults to today's UTC date if omitted.
+</ParamField>
+
+<ParamField body="notes" type="string">
+  Free-text notes summarizing the conversation, outcome, or any relevant context from the interaction.
+</ParamField>
+
+<ParamField body="next_step" type="string">
+  The next follow-up action agreed upon during this contact. Updates the `next_step` field on the parent lead.
+</ParamField>
+
+<ParamField body="next_step_due" type="string">
+  ISO 8601 due date for the next step (e.g. `2024-12-05`). Updates the `next_step_due` field on the parent lead.
+</ParamField>
+
+<ParamField body="logged_by" type="string">
+  Email address of the team member who conducted this activity. Defaults to the owner of the API key used to make the request.
+</ParamField>
+
+### Response Fields
+
+<ResponseField name="id" type="string">
+  The unique LeadRev identifier for this contact activity record.
+</ResponseField>
+
+<ResponseField name="lead_id" type="string">
+  The LeadRev ID of the lead this activity is attached to.
+</ResponseField>
+
+<ResponseField name="type" type="string">
+  The contact type: `call`, `email`, `meeting`, or `other`.
+</ResponseField>
+
+<ResponseField name="date" type="string">
+  ISO 8601 date of the contact as recorded.
+</ResponseField>
+
+<ResponseField name="notes" type="string">
+  The notes recorded for this activity, if provided.
+</ResponseField>
+
+<ResponseField name="next_step" type="string">
+  The next follow-up action set during this contact, if provided.
+</ResponseField>
+
+<ResponseField name="logged_by" type="string">
+  Email address of the team member who logged this activity.
+</ResponseField>
+
+<ResponseField name="created_at" type="string">
+  ISO 8601 timestamp of when this activity record was created in LeadRev.
+</ResponseField>
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.leadrev.ai/v1/contacts \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "lead_id": "lead_8fKz2mQp",
+    "type": "call",
+    "date": "2024-11-22",
+    "notes": "Spoke with VP of Procurement. Budget confirmed. Awaiting legal review of contract.",
+    "next_step": "Follow up after legal review",
+    "next_step_due": "2024-12-05",
+    "logged_by": "sarah@yourcompany.com"
+  }'
+```
+
+```javascript JavaScript fetch
+const response = await fetch("https://api.leadrev.ai/v1/contacts", {
+  method: "POST",
+  headers: {
+    "Authorization": "Bearer YOUR_API_KEY",
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    lead_id: "lead_8fKz2mQp",
+    type: "call",
+    date: "2024-11-22",
+    notes: "Spoke with VP of Procurement. Budget confirmed. Awaiting legal review of contract.",
+    next_step: "Follow up after legal review",
+    next_step_due: "2024-12-05",
+    logged_by: "sarah@yourcompany.com",
+  }),
+});
+
+const activity = await response.json();
+console.log(activity);
+```
+
+```json Response
+{
+  "id": "contact_7pRm4nLq",
+  "lead_id": "lead_8fKz2mQp",
+  "type": "call",
+  "date": "2024-11-22",
+  "notes": "Spoke with VP of Procurement. Budget confirmed. Awaiting legal review of contract.",
+  "next_step": "Follow up after legal review",
+  "logged_by": "sarah@yourcompany.com",
+  "created_at": "2024-11-22T14:32:07Z"
+}
+```
+
+</CodeGroup>
+
+---
+
+## GET /v1/contacts — List Contact Activities
+
+Returns the contact activity history for a specific lead, ordered by date descending (most recent first). Use this endpoint to display engagement timelines, audit contact cadence, or sync activity back to your CRM.
+
+### Query Parameters
+
+<ParamField query="lead_id" type="string" required>
+  The LeadRev ID of the lead whose activity history you want to retrieve.
+</ParamField>
+
+<ParamField query="page" type="integer">
+  The page number to return. Defaults to `1`.
+</ParamField>
+
+<ParamField query="per_page" type="integer">
+  The number of activity records to return per page. Defaults to `50`. Maximum is `100`.
+</ParamField>
+
+<ParamField query="type" type="string">
+  Filter results to a specific contact type. Accepted values: `call`, `email`, `meeting`, or `other`.
+</ParamField>
+
+<CodeGroup>
+
+```bash cURL
+curl -G https://api.leadrev.ai/v1/contacts \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  --data-urlencode "lead_id=lead_8fKz2mQp" \
+  --data-urlencode "type=call" \
+  --data-urlencode "per_page=20"
+```
+
+```javascript JavaScript fetch
+const params = new URLSearchParams({
+  lead_id: "lead_8fKz2mQp",
+  type: "call",
+  per_page: "20",
+});
+
+const response = await fetch(
+  `https://api.leadrev.ai/v1/contacts?${params.toString()}`,
+  {
+    headers: {
+      Authorization: "Bearer YOUR_API_KEY",
+    },
+  }
+);
+
+const history = await response.json();
+console.log(history);
+```
+
+```json Response
+{
+  "data": [
+    {
+      "id": "contact_7pRm4nLq",
+      "lead_id": "lead_8fKz2mQp",
+      "type": "call",
+      "date": "2024-11-22",
+      "notes": "Spoke with VP of Procurement. Budget confirmed. Awaiting legal review of contract.",
+      "next_step": "Follow up after legal review",
+      "logged_by": "sarah@yourcompany.com",
+      "created_at": "2024-11-22T14:32:07Z"
+    },
+    {
+      "id": "contact_2kBv6wYn",
+      "lead_id": "lead_8fKz2mQp",
+      "type": "call",
+      "date": "2024-11-08",
+      "notes": "Left voicemail. Sent follow-up email with updated proposal.",
+      "next_step": null,
+      "logged_by": "sarah@yourcompany.com",
+      "created_at": "2024-11-08T10:15:43Z"
+    }
+  ],
+  "meta": {
+    "page": 1,
+    "per_page": 20,
+    "total": 2,
+    "total_pages": 1
+  }
+}
+```
+
+</CodeGroup>

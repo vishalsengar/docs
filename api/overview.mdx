@@ -1,0 +1,148 @@
+---
+title: "LeadRev REST API: Overview and Getting Started Guide"
+sidebarTitle: "Overview"
+description: "The LeadRev API lets you import leads, retrieve recovery queue data, log contacts, manage tasks, and read pipeline metrics programmatically."
+---
+
+The LeadRev REST API gives you programmatic access to your entire LeadRev workspace — import leads in bulk, read the Recovery Queue, log contact activities, create tasks, and pull pipeline analytics into your own dashboards or workflows. All endpoints follow REST conventions and return JSON, making it straightforward to integrate LeadRev with your CRM, data warehouse, or internal tooling.
+
+## Base URL
+
+Every API request is made to the following base URL:
+
+```bash
+https://api.leadrev.ai/v1
+```
+
+Append the resource path to this base URL for each request — for example, `https://api.leadrev.ai/v1/leads`.
+
+## Authentication
+
+All requests require a valid API key passed as a Bearer token in the `Authorization` header. Without it, the API returns a `401 Unauthorized` response. See the [Authentication](/api/authentication) guide to generate your first key and learn about key scopes.
+
+## Request Format
+
+For `POST` and `PATCH` requests, send a JSON body and include the `Content-Type: application/json` header. `GET` and `DELETE` requests do not require a body — pass parameters as query strings instead.
+
+```bash
+curl -X POST https://api.leadrev.ai/v1/leads \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{ "email": "alex@example.com", "company": "Acme Corp" }'
+```
+
+## Response Format
+
+All responses return JSON. Successful responses wrap the result in a standard envelope with a `data` field and a `meta` field. The `meta` field always includes a `request_id` you can use for debugging and support requests.
+
+**Single-resource response:**
+
+```json
+{
+  "data": { ... },
+  "meta": {
+    "request_id": "req_abc123",
+    "timestamp": "2024-11-15T10:30:00Z"
+  }
+}
+```
+
+**List response:**
+
+For endpoints that return collections, `data` is an array and `meta` includes pagination details:
+
+```json
+{
+  "data": [ ... ],
+  "meta": {
+    "page": 1,
+    "per_page": 50,
+    "total": 214,
+    "request_id": "req_xyz789"
+  }
+}
+```
+
+## Pagination
+
+List endpoints support cursor-free page-based pagination via query parameters.
+
+| Parameter | Type | Default | Maximum | Description |
+|-----------|------|---------|---------|-------------|
+| `page` | integer | `1` | — | The page number to retrieve. |
+| `per_page` | integer | `50` | `100` | The number of records per page. |
+
+Pass these parameters as query strings:
+
+```bash
+GET https://api.leadrev.ai/v1/leads?page=2&per_page=25
+```
+
+Use the `total` value in `meta` to calculate how many pages exist (`ceil(total / per_page)`).
+
+## Rate Limits
+
+Each API key is limited to **60 requests per minute** by default. Every response includes rate limit headers so you can track your current usage:
+
+| Header | Description |
+|--------|-------------|
+| `X-RateLimit-Limit` | The maximum number of requests allowed per minute. |
+| `X-RateLimit-Remaining` | The number of requests remaining in the current window. |
+| `X-RateLimit-Reset` | The UTC epoch timestamp when the rate limit window resets. |
+
+When you exceed the limit, the API returns a `429 Too Many Requests` response. Back off and retry after the `X-RateLimit-Reset` time.
+
+<Note>
+  If your integration requires a higher rate limit, contact LeadRev support to discuss an elevated quota for your workspace.
+</Note>
+
+## Error Responses
+
+When a request fails, the API returns a JSON error envelope instead of a `data` object. The `error` field contains a machine-readable `code`, a human-readable `message`, and the HTTP `status` code.
+
+```json
+{
+  "error": {
+    "code": "LEAD_NOT_FOUND",
+    "message": "No lead found with the given ID.",
+    "status": 404
+  }
+}
+```
+
+Use the `code` field in your application logic to handle specific failure cases programmatically.
+
+**Common error codes:**
+
+| Code | HTTP Status | Meaning |
+|------|-------------|---------|
+| `UNAUTHORIZED` | 401 | Missing or invalid API key. |
+| `FORBIDDEN` | 403 | Valid key, but insufficient permissions for this resource. |
+| `NOT_FOUND` | 404 | The requested resource does not exist. |
+| `VALIDATION_ERROR` | 422 | The request body failed validation. Check the `message` for field-level details. |
+| `RATE_LIMITED` | 429 | You have exceeded the rate limit. Retry after `X-RateLimit-Reset`. |
+| `INTERNAL_ERROR` | 500 | An unexpected error occurred on LeadRev's servers. |
+
+## Available Resources
+
+<CardGroup cols={2}>
+  <Card title="Leads" icon="user-plus" href="/api/leads">
+    Import leads in bulk, retrieve individual lead records, update lead status, and query lead risk flags.
+  </Card>
+  <Card title="Recovery Queue" icon="circle-exclamation" href="/api/recovery-queue">
+    Read the prioritized Recovery Queue to surface overdue, no-next-step, untouched, and high-value at-risk leads.
+  </Card>
+  <Card title="Contacts" icon="address-book" href="/api/contacts">
+    Log contact activities such as calls, emails, and meetings against leads and accounts.
+  </Card>
+  <Card title="Tasks" icon="list-check" href="/api/tasks">
+    Create, update, and complete tasks tied to leads so your team always has a clear next step.
+  </Card>
+  <Card title="Pipeline" icon="chart-line" href="/api/pipeline">
+    Pull pipeline metrics, revenue leakage summaries, and at-risk deal data into your own dashboards.
+  </Card>
+</CardGroup>
+
+<Tip>
+  Include the `request_id` from the response `meta` (or the `X-Request-Id` response header) whenever you contact LeadRev support. It allows the team to trace the exact request and diagnose issues quickly.
+</Tip>

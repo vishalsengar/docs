@@ -1,0 +1,84 @@
+---
+title: "Set Up Notifications and Alerts for Your LeadRev Workspace"
+sidebarTitle: "Notifications"
+description: "Configure email, in-app, and Slack notifications for task assignments, overdue alerts, new queue entries, and weekly pipeline digests in LeadRev."
+---
+
+LeadRev can notify you and your team when leads enter the Recovery Queue, tasks become overdue, or your pipeline risk changes materially — so nothing slips through without someone seeing it. Notifications are configurable per user for personal alerts, and workspace-wide for shared team visibility.
+
+## Notification Types
+
+LeadRev supports five distinct notification events. Each can be enabled or disabled independently and delivered through your preferred channel.
+
+| Notification | Trigger | Default State |
+|---|---|---|
+| **Task Assigned** | A task is assigned to you by yourself or a teammate | Enabled |
+| **Task Overdue** | A task passes its due date without being completed | Enabled |
+| **Lead Enters Queue** | A lead crosses the At Risk threshold for the first time | Enabled |
+| **Lead Goes Critical** | A lead moves from At Risk to the Critical tier | Enabled |
+| **Weekly Pipeline Digest** | Summary email sent every Monday morning with pipeline risk and leakage metrics | Enabled |
+
+## Per-User Notification Settings
+
+Each team member controls their own notification preferences independently. Changes you make apply only to your account.
+
+<Steps>
+  <Step title="Open Notification Settings">
+    Click your **Avatar** in the top-right corner of any LeadRev page and select **Notification Settings** from the dropdown menu.
+  </Step>
+  <Step title="Toggle Notification Types">
+    Use the toggle next to each notification type to turn it on or off. Disabled notifications will not be delivered through any channel.
+  </Step>
+  <Step title="Choose a Delivery Channel">
+    For each enabled notification, select your preferred delivery channel: **In-App**, **Email**, or **Both**. In-App notifications appear in the bell icon in the top navigation bar.
+  </Step>
+  <Step title="Save Your Changes">
+    Click **Save Changes** at the bottom of the page. Your new preferences take effect immediately.
+  </Step>
+</Steps>
+
+## Slack Integration
+
+Connect LeadRev to Slack to receive notifications directly in your team's channels. This is especially useful for shared visibility on Critical leads and pipeline health without requiring teammates to log into LeadRev.
+
+To connect Slack, go to **Settings → Integrations → Slack** and click **Connect**. You will be redirected to Slack's OAuth flow — authorize LeadRev to post to your workspace, then return to LeadRev.
+
+Once connected, you can route each notification event to a specific Slack channel. For example, send **Lead Goes Critical** alerts to `#sales-alerts` and the **Weekly Pipeline Digest** to `#revenue-team`.
+
+Slack messages from LeadRev follow this format:
+
+```text
+🔴 Lead Goes Critical
+Acme Corp (Proposal stage) — $42,500
+No contact in 31 days. Last activity: Phone Call on Oct 15.
+Owner: Sarah Chen
+→ View in LeadRev: https://app.leadrev.ai/leads/lead_abc123
+```
+
+## Workspace-Level Alerts
+
+Admins can configure alert rules that broadcast to a shared Slack channel or email distribution list, regardless of individual user preferences. These are useful for escalation visibility — for example, notifying a sales manager's shared inbox whenever a high-value lead goes Critical.
+
+Navigate to **Settings → Notifications → Workspace Alerts** to configure:
+
+- **High-Value Critical Alert** — fires when any lead above your configured High Value Threshold enters the Critical tier. Deliver to a shared Slack channel or email DL.
+- **Weekly Leakage Summary** — a Monday morning admin-level digest summarizing total revenue leakage for the week, sent to a designated email address or distribution list.
+
+Workspace-level alerts run in addition to individual user notifications, not instead of them.
+
+## Digest Email Format
+
+The **Weekly Pipeline Digest** is delivered every Monday morning and is designed to give you — and your manager — a concise view of pipeline health without requiring a full dashboard review.
+
+Each digest includes:
+
+- **Total pipeline value** — the combined deal value of all open leads in your workspace
+- **Week-over-week change in pipeline at risk** — the delta in At Risk + Critical deal value compared to the previous Monday
+- **New leads added to the Recovery Queue** — leads that crossed the At Risk threshold for the first time in the past seven days
+- **Top 5 leads by deal value in Critical tier** — ranked by deal size, with owner, stage, and days since last contact
+
+The digest is sent to the email address associated with your LeadRev account. Admins can also send a workspace-wide version to a shared distribution list via **Settings → Notifications → Workspace Alerts**.
+
+<Tip>
+  Enable the Weekly Pipeline Digest even if you rely on in-app notifications day-to-day — it's the best async summary for managers who need a high-level read on pipeline health without drilling into the dashboard every morning.
+</Tip>

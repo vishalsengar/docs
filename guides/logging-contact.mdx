@@ -1,0 +1,116 @@
+---
+title: "Log Contact Activities on Leads to Update Health Scores"
+sidebarTitle: "Log Contact"
+description: "Record calls, emails, and meetings on any lead in LeadRev to update health scores, track engagement history, and clear overdue flags."
+---
+
+Logging a contact activity in LeadRev does more than record a note — it updates the lead's last contact date, triggers a recalculation of the health score, and clears the overdue flag if the new contact falls within the required cadence window. Every touchpoint you log is a signal that moves the deal forward in LeadRev's risk model, so consistent logging is one of the highest-leverage habits your team can build.
+
+## Logging from the Lead Detail View
+
+<Steps>
+  <Step title="Open a lead">
+    Navigate to the lead from the **Recovery Queue**, the **Leads** list, or the **Revenue Leakage** tab. Click the lead name to open the detail panel.
+  </Step>
+  <Step title="Click Log Contact">
+    In the activity panel on the right side of the detail view, click the **Log Contact** button. A contact form slides in above the activity timeline.
+  </Step>
+  <Step title="Select the contact type">
+    Choose the type of touchpoint from the dropdown: **Call**, **Email**, **Meeting**, or **Other**. The type is recorded in the activity timeline and used to categorize engagement patterns.
+  </Step>
+  <Step title="Enter the date">
+    The date field defaults to today. If you're logging a contact that occurred earlier (for example, a call from yesterday that you're recording now), update the date to reflect when the touchpoint actually happened. LeadRev uses this date — not the logging date — to calculate days since last contact.
+  </Step>
+  <Step title="Add notes">
+    Enter notes about the conversation, outcome, or any relevant context. Good notes save time on the next call and give teammates the context they need when a deal is reassigned.
+  </Step>
+  <Step title="Set or update the Next Step">
+    Fill in the **Next Step** field to record what happens next. Enter a description (for example, "Send pricing deck") and an optional due date. Setting a next step clears the no-next-step risk signal and signals to LeadRev that the deal has forward momentum.
+  </Step>
+  <Step title="Click Save">
+    Click **Save** to commit the contact. The activity timeline updates immediately, the last contact date resets, and the health score recalculates in real time. If the contact clears the overdue threshold, the overdue flag disappears from the lead card.
+  </Step>
+</Steps>
+
+## Contact Types
+
+Each contact type maps to a distinct kind of outreach. Use the right type so your engagement history reflects what actually happened — this helps LeadRev identify patterns and gives your team accurate reporting on channel effectiveness.
+
+- **Call** — use for any outbound or inbound phone conversation, including voicemails left. Even an unanswered call where you left a voicemail counts as an attempt and should be logged.
+- **Email** — use for any sent or received email exchange. Log both mass outreach and one-to-one correspondence under this type.
+- **Meeting** — use for video calls, in-person meetings, product demos, or discovery calls. Meetings typically carry the most weight in health score recalculations because they represent deeper engagement.
+- **Other** — use for touchpoints that don't fit the above categories: a LinkedIn message, an SMS, a direct message on Slack or Teams, a tradeshow conversation, or any other non-standard interaction.
+
+## Setting the Next Step
+
+Always set a next step when you log a contact. The next step field is the most direct way to signal that a deal has active forward momentum, and its absence is one of the first signals LeadRev uses to flag a lead as at-risk.
+
+A missing next step raises the health score threshold required to keep a lead out of the Recovery Queue. In practice, a lead with no next step can tip from Healthy to At Risk even when the last contact was recent.
+
+The **Next Step** field accepts free text (up to 500 characters) and an optional **Due Date**. When the due date passes without the next step being updated or replaced, LeadRev flags the lead as having an overdue next step — another risk signal that feeds into the health score. To handle overdue next steps with structured follow-ups, see [Tasks and Follow-Ups](/guides/tasks-and-follow-ups).
+
+## Logging via API
+
+If your team uses a CRM, sequencing tool, or custom workflow, you can log contacts programmatically via the LeadRev API. This allows you to sync activities from external systems without requiring reps to double-log. See [API: Contacts](/api/contacts) for the full reference.
+
+<CodeGroup>
+```bash curl
+curl --request POST \
+  --url https://api.leadrev.io/v1/contacts \
+  --header 'Authorization: Bearer YOUR_API_KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "lead_id": "lead_abc123",
+    "type": "call",
+    "date": "2024-11-15",
+    "notes": "Discussed renewal timeline. Decision by Dec 1.",
+    "next_step": "Send proposal by Nov 20",
+    "next_step_due": "2024-11-20"
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.leadrev.io/v1/contacts', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    lead_id: 'lead_abc123',
+    type: 'call',
+    date: '2024-11-15',
+    notes: 'Discussed renewal timeline. Decision by Dec 1.',
+    next_step: 'Send proposal by Nov 20',
+    next_step_due: '2024-11-20',
+  }),
+});
+
+const contact = await response.json();
+console.log(contact);
+```
+</CodeGroup>
+
+A successful request returns a `201 Created` response with the created contact object, including the updated health score for the associated lead.
+
+## Viewing Contact History
+
+Every contact you log is added to the **Activity Timeline** on the lead detail view. The timeline presents a reverse-chronological list of all recorded events for the lead, including:
+
+- Logged contact activities (with type, date, and notes)
+- Completed tasks (with title and completion date)
+- Pipeline stage changes (with the before and after stage)
+- Health score change events (annotated with what triggered the change)
+
+Use the timeline to understand the full history of a deal before a call, to onboard a new owner who's picking up someone else's lead, or to investigate why a lead's health score shifted.
+
+<Info>
+  Contact history is visible to all team members who have access to the lead. There are no private notes in the activity timeline — write notes with the assumption that your manager, a teammate, or a future owner of the deal will read them.
+</Info>
+
+## Related Resources
+
+- [Tasks and Follow-Ups](/guides/tasks-and-follow-ups) — schedule structured reminders and assign follow-up work to teammates.
+- [Working the Recovery Queue](/guides/working-recovery-queue) — use contact logging to clear leads from the at-risk queue.
+- [API: Contacts](/api/contacts) — full API reference for creating and retrieving contact activities.
+- [API Authentication](/api/authentication) — how to generate and use your API key.

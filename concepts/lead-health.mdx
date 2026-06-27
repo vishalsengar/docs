@@ -1,0 +1,83 @@
+---
+title: "Lead Health Scoring: How LeadRev Calculates Deal Risk"
+sidebarTitle: "Lead Health"
+description: "Learn how LeadRev calculates lead health scores using recency, next-step presence, deal value, and stage age to surface at-risk opportunities."
+---
+
+LeadRev assigns every lead a health score from 0–100 and a risk tier — **Healthy**, **At Risk**, or **Critical** — based on multiple signals evaluated together. No single signal determines a lead's health; instead, LeadRev weighs the full picture of engagement recency, forward momentum, deal value, and pipeline age to give you a score that reflects the true state of each opportunity. A high score means the deal is moving; a low score means it needs your attention now.
+
+## Health Score Components
+
+Each lead's health score is computed from the following inputs. LeadRev evaluates all components together — a strong signal in one area can partially offset weakness in another, but a lead with multiple risk signals will always trend toward a lower score.
+
+| Component | What LeadRev Measures | Risk Direction |
+|---|---|---|
+| **Last Contact Recency** | Days elapsed since the last logged touchpoint (call, email, meeting, or activity) | More days = lower score |
+| **Next Step Present** | Whether an open task or defined next step exists for this lead | No next step = risk signal |
+| **Time in Stage** | Days the lead has spent in its current pipeline stage without advancing | More days = lower score |
+| **Deal Value Weight** | The monetary value of the lead or opportunity | Higher value = elevated risk priority |
+| **Lead Age** | Days since the lead was created or imported into LeadRev | Older with no activity = lower score |
+
+Deal Value Weight does not lower a score on its own — it acts as a multiplier that escalates how urgently an at-risk lead is treated. A $500 deal stalling for 20 days and a $50,000 deal stalling for the same period will have different risk priorities even if their raw scores are similar.
+
+## Risk Tiers
+
+LeadRev maps every health score to one of three risk tiers. Each tier carries a distinct meaning and a recommended action stance for your team.
+
+<Tabs>
+  <Tab title="Healthy (70–100)">
+    **What it means:** This lead shows active engagement. Your team has made recent contact, a next step is set, and the deal is progressing through the pipeline at a normal pace. There are no compounding risk signals present.
+
+    **What to do:** Continue working the lead according to your normal cadence. No immediate intervention is required, but keep an eye on recency — a healthy lead can move to At Risk quickly if contact lapses.
+
+    **Typical profile:**
+    - Last contact within the past 7 days
+    - Open task or next step exists
+    - Stage age within expected range for this pipeline stage
+  </Tab>
+  <Tab title="At Risk (40–69)">
+    **What it means:** One or more warning signals are present. Contact may be overdue, a next step may be missing, or the lead has been sitting in its current stage longer than expected. The deal is not yet in danger of being permanently lost, but it will deteriorate without action.
+
+    **What to do:** Prioritize this lead in your next working session. Log a contact, set a next step, or advance the pipeline stage. Even a brief touchpoint can return a lead to Healthy status quickly.
+
+    **Typical profile:**
+    - Last contact between 8 and 21 days ago
+    - No next step set, or a past-due task
+    - Stage age approaching the upper end of the expected range
+  </Tab>
+  <Tab title="Critical (0–39)">
+    **What it means:** Multiple risk signals are compounding. The lead has seen no meaningful engagement for an extended period, no next step exists, or a high-value deal has stalled with no recent activity. Without immediate outreach, this lead is likely to be permanently lost.
+
+    **What to do:** Treat this as an emergency recovery target. Open the lead's detail panel from the Recovery Queue, review the last known context, and make contact as soon as possible. If the deal is no longer viable, mark it accordingly so it stops consuming queue bandwidth.
+
+    **Typical profile:**
+    - No contact in 21+ days (or 14+ days for high-value leads)
+    - No next step set
+    - Lead untouched since import, or high-value deal with no engagement signals
+  </Tab>
+</Tabs>
+
+## What Triggers a Risk Flag
+
+LeadRev applies a risk flag to a lead — elevating its urgency in the Recovery Queue — when any of the following conditions are met:
+
+- **No contact in 14 or more days** — The lead has had no logged touchpoint (call, email, meeting, or activity) in the past 14 days
+- **No next step set** — There is no open task or defined follow-up action associated with the lead
+- **High-value deal with no recent activity** — The lead's deal value exceeds your configured high-value threshold and no contact has been logged within the high-value recency window
+- **Untouched since import** — The lead has been in LeadRev with zero logged activity since it was created or imported
+
+Multiple simultaneous flags compound the score penalty. A lead that is both overdue on contact and missing a next step will score lower than a lead with only one flag present.
+
+## Health Score Updates
+
+Health scores are not static — LeadRev recalculates a lead's score automatically whenever a relevant event occurs:
+
+- **Logging a contact** (call, email, meeting, or note) resets the Last Contact Recency signal and can immediately improve the score
+- **Completing or creating a task** updates the Next Step Present signal
+- **Updating lead metadata** (deal value, pipeline stage, or owner) triggers a full re-evaluation of all components
+
+If you need to force a recalculation outside of these events, open the lead's detail view and select **Recalculate Score** from the actions menu. The updated score and tier will reflect immediately across the Recovery Queue and pipeline dashboards.
+
+<Note>
+  Risk thresholds — including the no-contact window, high-value deal definition, and stage age limits — are configurable for your organization. See [Risk Threshold Configuration](/configuration/risk-thresholds) to adjust the defaults to match your sales cycle.
+</Note>

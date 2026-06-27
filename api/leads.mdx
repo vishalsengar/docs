@@ -1,0 +1,381 @@
+---
+title: "Leads API: Import, List, Retrieve, and Update Leads"
+sidebarTitle: "Leads"
+description: "REST API endpoints for creating, importing, listing, retrieving, and updating leads in LeadRev with health scores and risk metadata."
+---
+
+The Leads endpoints allow you to import leads in bulk, retrieve individual leads with their health scores and risk metadata, and update lead properties programmatically. All requests require a valid API key passed as a Bearer token in the `Authorization` header.
+
+---
+
+## POST /v1/leads — Import or Upsert Leads
+
+Imports an array of lead objects into your LeadRev workspace. If a lead with the same `name` and `owner` combination already exists, it is updated in place (upserted) rather than duplicated. LeadRev calculates a health score for each lead immediately after import.
+
+<Note>
+  Stage names in the `stage` field must exactly match the pipeline stage names configured in your workspace. You can retrieve your configured stages from your workspace settings.
+</Note>
+
+### Request Body
+
+The request body is a JSON array of lead objects. Each object supports the following fields:
+
+<ParamField body="name" type="string" required>
+  The lead or company name. Combined with `owner` to identify unique leads for upsert behavior.
+</ParamField>
+
+<ParamField body="owner" type="string" required>
+  The email address of the team member responsible for this lead. Must match an existing member in your workspace.
+</ParamField>
+
+<ParamField body="stage" type="string" required>
+  The pipeline stage name this lead is currently in. Must match one of your workspace's configured stage names exactly.
+</ParamField>
+
+<ParamField body="deal_value" type="number">
+  The expected deal value in USD. Used to calculate pipeline value and revenue leakage exposure.
+</ParamField>
+
+<ParamField body="last_contact_date" type="string">
+  ISO 8601 date of the most recent contact with this lead (e.g. `2024-11-15`). Used to compute the recency component of the health score.
+</ParamField>
+
+<ParamField body="next_step" type="string">
+  A short description of the next follow-up action planned for this lead.
+</ParamField>
+
+<ParamField body="next_step_due" type="string">
+  ISO 8601 due date for the next step (e.g. `2024-12-01`). Used to compute the next-step component of the health score.
+</ParamField>
+
+<ParamField body="created_date" type="string">
+  ISO 8601 date when this lead was originally created. Defaults to the current UTC date if omitted.
+</ParamField>
+
+<ParamField body="external_id" type="string">
+  Your CRM's unique identifier for this lead. Stored for reference and can be used for deduplication in your own integrations.
+</ParamField>
+
+### Response Fields
+
+<ResponseField name="imported" type="integer">
+  The number of new leads created during this import.
+</ResponseField>
+
+<ResponseField name="updated" type="integer">
+  The number of existing leads that were updated (upserted) during this import.
+</ResponseField>
+
+<ResponseField name="errors" type="array">
+  An array of error objects for any leads that failed to import. Each error includes an `index` (position in your input array), the `name` of the lead, and a `message` describing the failure. An empty array indicates a fully successful import.
+</ResponseField>
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.leadrev.ai/v1/leads \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '[
+    {
+      "name": "Acme Corp",
+      "owner": "sarah@yourcompany.com",
+      "stage": "Proposal",
+      "deal_value": 48000,
+      "last_contact_date": "2024-11-20",
+      "next_step": "Send revised pricing deck",
+      "next_step_due": "2024-11-27",
+      "external_id": "crm_lead_001"
+    },
+    {
+      "name": "Globex Industries",
+      "owner": "james@yourcompany.com",
+      "stage": "Discovery",
+      "deal_value": 22500,
+      "last_contact_date": "2024-11-10",
+      "next_step": "Schedule technical demo",
+      "next_step_due": "2024-11-25",
+      "external_id": "crm_lead_002"
+    }
+  ]'
+```
+
+```json Response
+{
+  "imported": 2,
+  "updated": 0,
+  "errors": []
+}
+```
+
+</CodeGroup>
+
+---
+
+## GET /v1/leads — List Leads
+
+Returns a paginated list of leads in your workspace. Use the query parameters below to filter by risk tier, pipeline stage, owner, or queue membership.
+
+### Query Parameters
+
+<ParamField query="page" type="integer">
+  The page number to return. Defaults to `1`.
+</ParamField>
+
+<ParamField query="per_page" type="integer">
+  The number of leads to return per page. Defaults to `50`. Maximum is `100`.
+</ParamField>
+
+<ParamField query="risk_tier" type="string">
+  Filter leads by risk classification. Accepted values: `healthy`, `at_risk`, or `critical`.
+</ParamField>
+
+<ParamField query="stage" type="string">
+  Filter leads by pipeline stage name. Must match your workspace's configured stage names exactly.
+</ParamField>
+
+<ParamField query="owner" type="string">
+  Filter leads by owner email address to retrieve only leads assigned to a specific team member.
+</ParamField>
+
+<ParamField query="in_queue" type="boolean">
+  Set to `true` to return only leads currently in the Recovery Queue.
+</ParamField>
+
+<CodeGroup>
+
+```bash cURL
+curl -G https://api.leadrev.ai/v1/leads \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  --data-urlencode "risk_tier=critical" \
+  --data-urlencode "per_page=25" \
+  --data-urlencode "page=1"
+```
+
+```json Response
+{
+  "data": [
+    {
+      "id": "lead_8fKz2mQp",
+      "name": "Acme Corp",
+      "owner": "sarah@yourcompany.com",
+      "stage": "Proposal",
+      "deal_value": 48000,
+      "health_score": 28,
+      "risk_tier": "critical",
+      "last_contact_date": "2024-10-05",
+      "next_step": "Send revised pricing deck"
+    },
+    {
+      "id": "lead_3nWx9rTv",
+      "name": "Globex Industries",
+      "owner": "james@yourcompany.com",
+      "stage": "Discovery",
+      "deal_value": 22500,
+      "health_score": 41,
+      "risk_tier": "critical",
+      "last_contact_date": "2024-10-12",
+      "next_step": "Schedule technical demo"
+    }
+  ],
+  "meta": {
+    "page": 1,
+    "per_page": 25,
+    "total": 2,
+    "total_pages": 1
+  }
+}
+```
+
+</CodeGroup>
+
+---
+
+## GET /v1/leads/{id} — Get a Single Lead
+
+Returns a single lead with full detail including its health score, health score components, and Recovery Queue status.
+
+### Path Parameters
+
+<ParamField path="id" type="string" required>
+  The LeadRev ID of the lead to retrieve (e.g. `lead_8fKz2mQp`).
+</ParamField>
+
+### Response Fields
+
+<ResponseField name="id" type="string">
+  The unique LeadRev identifier for this lead.
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  The lead or company name.
+</ResponseField>
+
+<ResponseField name="owner" type="string">
+  Email address of the team member responsible for this lead.
+</ResponseField>
+
+<ResponseField name="stage" type="string">
+  The current pipeline stage name.
+</ResponseField>
+
+<ResponseField name="deal_value" type="number">
+  The expected deal value in USD.
+</ResponseField>
+
+<ResponseField name="health_score" type="integer">
+  The lead's overall health score from 0–100. Scores below 50 are `at_risk`; scores below 30 are `critical`.
+</ResponseField>
+
+<ResponseField name="risk_tier" type="string">
+  The lead's risk classification: `healthy`, `at_risk`, or `critical`.
+</ResponseField>
+
+<ResponseField name="health_score_components" type="object">
+  A breakdown of the three sub-scores that make up the overall health score.
+
+  <Expandable title="health_score_components fields">
+    <ResponseField name="recency_score" type="integer">
+      Score component (0–100) based on how recently the lead was contacted.
+    </ResponseField>
+
+    <ResponseField name="next_step_score" type="integer">
+      Score component (0–100) based on whether a next step exists and whether it is overdue.
+    </ResponseField>
+
+    <ResponseField name="stage_age_score" type="integer">
+      Score component (0–100) based on how long the lead has been in its current stage relative to your workspace's stage thresholds.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="days_since_contact" type="integer">
+  The number of days elapsed since the most recent logged contact activity.
+</ResponseField>
+
+<ResponseField name="in_recovery_queue" type="boolean">
+  Whether this lead is currently in the Recovery Queue.
+</ResponseField>
+
+<ResponseField name="last_contact_date" type="string">
+  ISO 8601 date of the most recent contact.
+</ResponseField>
+
+<ResponseField name="next_step" type="string">
+  Description of the next planned follow-up action.
+</ResponseField>
+
+<ResponseField name="next_step_due" type="string">
+  ISO 8601 due date for the next step.
+</ResponseField>
+
+<ResponseField name="external_id" type="string">
+  Your CRM's identifier for this lead, if provided at import.
+</ResponseField>
+
+<ResponseField name="created_date" type="string">
+  ISO 8601 date when this lead was created.
+</ResponseField>
+
+<CodeGroup>
+
+```bash cURL
+curl https://api.leadrev.ai/v1/leads/lead_8fKz2mQp \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```json Response
+{
+  "id": "lead_8fKz2mQp",
+  "name": "Acme Corp",
+  "owner": "sarah@yourcompany.com",
+  "stage": "Proposal",
+  "deal_value": 48000,
+  "health_score": 28,
+  "risk_tier": "critical",
+  "health_score_components": {
+    "recency_score": 15,
+    "next_step_score": 40,
+    "stage_age_score": 30
+  },
+  "days_since_contact": 46,
+  "in_recovery_queue": true,
+  "last_contact_date": "2024-10-05",
+  "next_step": "Send revised pricing deck",
+  "next_step_due": "2024-11-27",
+  "external_id": "crm_lead_001",
+  "created_date": "2024-08-14"
+}
+```
+
+</CodeGroup>
+
+---
+
+## PATCH /v1/leads/{id} — Update a Lead
+
+Updates one or more mutable fields on an existing lead. Only the fields you include in the request body are changed — all other fields remain unchanged.
+
+<Tip>
+  Updating `stage`, `next_step`, or `next_step_due` triggers an immediate recalculation of the lead's health score and may change its risk tier.
+</Tip>
+
+### Path Parameters
+
+<ParamField path="id" type="string" required>
+  The LeadRev ID of the lead to update.
+</ParamField>
+
+### Request Body
+
+<ParamField body="stage" type="string">
+  Move the lead to a different pipeline stage. Must match one of your workspace's configured stage names.
+</ParamField>
+
+<ParamField body="deal_value" type="number">
+  Update the expected deal value in USD.
+</ParamField>
+
+<ParamField body="next_step" type="string">
+  Update the description of the next follow-up action.
+</ParamField>
+
+<ParamField body="next_step_due" type="string">
+  Update the ISO 8601 due date for the next step.
+</ParamField>
+
+<ParamField body="owner" type="string">
+  Reassign the lead to a different team member by email address.
+</ParamField>
+
+<CodeGroup>
+
+```bash cURL
+curl -X PATCH https://api.leadrev.ai/v1/leads/lead_8fKz2mQp \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "stage": "Negotiation",
+    "next_step": "Review contract redlines with legal",
+    "next_step_due": "2024-12-03"
+  }'
+```
+
+```json Response
+{
+  "id": "lead_8fKz2mQp",
+  "name": "Acme Corp",
+  "owner": "sarah@yourcompany.com",
+  "stage": "Negotiation",
+  "deal_value": 48000,
+  "health_score": 67,
+  "risk_tier": "healthy",
+  "last_contact_date": "2024-10-05",
+  "next_step": "Review contract redlines with legal",
+  "next_step_due": "2024-12-03",
+  "external_id": "crm_lead_001",
+  "created_date": "2024-08-14"
+}
+```
+
+</CodeGroup>

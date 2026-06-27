@@ -1,0 +1,254 @@
+---
+title: "Tasks API: Create, List, and Complete Follow-Up Tasks"
+sidebarTitle: "Tasks"
+description: "API endpoints for creating, listing, and completing follow-up tasks tied to leads in LeadRev, with due dates, assignees, and completion tracking."
+---
+
+The Tasks endpoints let you create follow-up reminders tied to specific leads, assign them to team members, and mark them complete — all programmatically from your own tools or automations. Tasks appear in LeadRev alongside each lead record, giving your team a single place to track what needs to happen next without switching to a separate task manager.
+
+---
+
+## POST /v1/tasks — Create a Task
+
+Creates a new follow-up task attached to a lead. The task immediately appears in the assignee's task list inside LeadRev.
+
+<Tip>
+  For time-sensitive leads, pair task creation with a contact log: POST to `/v1/contacts` to record what happened, then POST to `/v1/tasks` to schedule the next action. Both calls can be made in parallel.
+</Tip>
+
+### Request Body
+
+<ParamField body="lead_id" type="string" required>
+  The LeadRev ID of the lead this task is associated with.
+</ParamField>
+
+<ParamField body="title" type="string" required>
+  A short, descriptive title for the task (e.g. "Send follow-up proposal").
+</ParamField>
+
+<ParamField body="due_date" type="string" required>
+  ISO 8601 due date for this task (e.g. `2024-12-05`). Tasks past their due date without a `completed` status are automatically flagged as `overdue`.
+</ParamField>
+
+<ParamField body="assignee" type="string">
+  Email address of the team member responsible for completing this task. Defaults to the owner of the API key used to make the request.
+</ParamField>
+
+<ParamField body="notes" type="string">
+  Additional context or instructions for the person completing the task.
+</ParamField>
+
+### Response Fields
+
+<ResponseField name="id" type="string">
+  The unique LeadRev identifier for this task.
+</ResponseField>
+
+<ResponseField name="lead_id" type="string">
+  The LeadRev ID of the lead this task is attached to.
+</ResponseField>
+
+<ResponseField name="title" type="string">
+  The task title.
+</ResponseField>
+
+<ResponseField name="due_date" type="string">
+  ISO 8601 due date for this task.
+</ResponseField>
+
+<ResponseField name="assignee" type="string">
+  Email address of the team member assigned to this task.
+</ResponseField>
+
+<ResponseField name="notes" type="string">
+  Additional notes attached to the task, if provided.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  The current status of the task. Newly created tasks always have a status of `pending`.
+</ResponseField>
+
+<ResponseField name="created_at" type="string">
+  ISO 8601 timestamp of when this task was created.
+</ResponseField>
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.leadrev.ai/v1/tasks \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "lead_id": "lead_8fKz2mQp",
+    "title": "Send revised pricing deck",
+    "due_date": "2024-12-03",
+    "assignee": "sarah@yourcompany.com",
+    "notes": "Use the Q4 template and include the volume discount for 500+ seats."
+  }'
+```
+
+```json Response
+{
+  "id": "task_5dHj1xCr",
+  "lead_id": "lead_8fKz2mQp",
+  "title": "Send revised pricing deck",
+  "due_date": "2024-12-03",
+  "assignee": "sarah@yourcompany.com",
+  "notes": "Use the Q4 template and include the volume discount for 500+ seats.",
+  "status": "pending",
+  "created_at": "2024-11-22T15:04:11Z"
+}
+```
+
+</CodeGroup>
+
+---
+
+## GET /v1/tasks — List Tasks
+
+Returns a paginated list of tasks, optionally filtered by lead, assignee, status, or due date range. Use this endpoint to build task digests, overdue reports, or daily briefings for your team.
+
+### Query Parameters
+
+<ParamField query="lead_id" type="string">
+  Filter tasks to a specific lead by its LeadRev ID.
+</ParamField>
+
+<ParamField query="assignee" type="string">
+  Filter tasks assigned to a specific team member by their email address.
+</ParamField>
+
+<ParamField query="status" type="string">
+  Filter tasks by status. Accepted values: `pending`, `completed`, or `overdue`.
+</ParamField>
+
+<ParamField query="due_before" type="string">
+  ISO 8601 date. Return only tasks with a `due_date` on or before this date.
+</ParamField>
+
+<ParamField query="due_after" type="string">
+  ISO 8601 date. Return only tasks with a `due_date` on or after this date.
+</ParamField>
+
+<ParamField query="page" type="integer">
+  The page number to return. Defaults to `1`.
+</ParamField>
+
+<ParamField query="per_page" type="integer">
+  The number of tasks to return per page. Defaults to `50`. Maximum is `100`.
+</ParamField>
+
+<CodeGroup>
+
+```bash cURL
+curl -G https://api.leadrev.ai/v1/tasks \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  --data-urlencode "assignee=sarah@yourcompany.com" \
+  --data-urlencode "status=overdue"
+```
+
+```json Response
+{
+  "data": [
+    {
+      "id": "task_5dHj1xCr",
+      "lead_id": "lead_8fKz2mQp",
+      "title": "Send revised pricing deck",
+      "due_date": "2024-12-03",
+      "assignee": "sarah@yourcompany.com",
+      "notes": "Use the Q4 template and include the volume discount for 500+ seats.",
+      "status": "overdue",
+      "created_at": "2024-11-22T15:04:11Z"
+    }
+  ],
+  "meta": {
+    "page": 1,
+    "per_page": 50,
+    "total": 1,
+    "total_pages": 1
+  }
+}
+```
+
+</CodeGroup>
+
+---
+
+## PATCH /v1/tasks/{id} — Update or Complete a Task
+
+Updates one or more fields on an existing task. To mark a task as complete, set `status` to `completed`. Only the fields you include in the request body are changed.
+
+<Note>
+  Once a task's `status` is set to `completed`, it cannot be reverted to `pending` via the API. If you need to reopen a completed task, create a new task on the same lead.
+</Note>
+
+### Path Parameters
+
+<ParamField path="id" type="string" required>
+  The LeadRev ID of the task to update.
+</ParamField>
+
+### Request Body
+
+<ParamField body="title" type="string">
+  Updated title for the task.
+</ParamField>
+
+<ParamField body="due_date" type="string">
+  Updated ISO 8601 due date for the task.
+</ParamField>
+
+<ParamField body="assignee" type="string">
+  Reassign the task to a different team member by email address.
+</ParamField>
+
+<ParamField body="notes" type="string">
+  Updated notes or instructions for the task.
+</ParamField>
+
+<ParamField body="status" type="string">
+  Update the task status. Set to `completed` to mark the task as done. Accepted values: `pending`, `completed`.
+</ParamField>
+
+<ParamField body="completion_notes" type="string">
+  Optional notes describing the outcome when marking a task as `completed`. Stored alongside the task record for audit and review purposes.
+</ParamField>
+
+<CodeGroup>
+
+```bash Mark as Complete
+curl -X PATCH https://api.leadrev.ai/v1/tasks/task_5dHj1xCr \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "status": "completed",
+    "completion_notes": "Sent pricing deck at 2pm. Prospect confirmed receipt and will review by EOW."
+  }'
+```
+
+```bash Reschedule a Task
+curl -X PATCH https://api.leadrev.ai/v1/tasks/task_5dHj1xCr \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "due_date": "2024-12-10",
+    "assignee": "james@yourcompany.com",
+    "notes": "Reassigned to James while Sarah is out of office."
+  }'
+```
+
+```json Response
+{
+  "id": "task_5dHj1xCr",
+  "lead_id": "lead_8fKz2mQp",
+  "title": "Send revised pricing deck",
+  "due_date": "2024-12-03",
+  "assignee": "sarah@yourcompany.com",
+  "notes": "Use the Q4 template and include the volume discount for 500+ seats.",
+  "status": "completed",
+  "completion_notes": "Sent pricing deck at 2pm. Prospect confirmed receipt and will review by EOW.",
+  "created_at": "2024-11-22T15:04:11Z"
+}
+```
+
+</CodeGroup>

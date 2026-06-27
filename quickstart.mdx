@@ -1,0 +1,44 @@
+---
+title: "Get Started with LeadRev: Import Leads in 5 Minutes"
+sidebarTitle: "Quickstart"
+description: "Import your first leads, trigger LeadRev's automated risk detection engine, and start working your Recovery Queue in under five minutes."
+---
+
+This guide walks you through everything you need to go from a blank LeadRev account to an active Recovery Queue with real leads. By the end, you'll have imported your first batch of leads, watched the risk detection engine flag at-risk deals, logged your first contact activity, and have a clear picture of what to do next. The whole process takes about five minutes.
+
+<Steps>
+  <Step title="Create your account">
+    Sign up for a LeadRev account at [app.leadrev.ai](https://app.leadrev.ai). During onboarding, you'll create a **workspace** — a shared environment where your team's leads, tasks, and pipeline data live. Give your workspace a name that matches your organization (for example, "Acme Sales" or "EMEA Revenue Team"). You can invite teammates from the workspace settings at any time after setup completes.
+  </Step>
+  <Step title="Get your API key">
+    Navigate to **Settings → API Keys** in the left sidebar. Click **Generate New Key**, give it a descriptive label (for example, "CRM Sync" or "Local Dev"), and click **Create**. Copy the key immediately — LeadRev only displays it once for security reasons. Store it in a secure location such as a password manager or secrets vault. You'll need this key to authenticate any API requests, including the import call in the next step.
+  </Step>
+  <Step title="Import your first leads">
+    You can bring leads into LeadRev via CSV upload in the dashboard or by posting directly to the API. To get started quickly, use the API to import a lead now.
+
+    Replace `YOUR_API_KEY` with the key you generated in the previous step:
+
+    ```bash
+    curl -X POST https://api.leadrev.ai/v1/leads \
+      -H "Authorization: Bearer YOUR_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d '[{"name": "Acme Corp", "owner": "jane@company.com", "deal_value": 25000, "stage": "Proposal", "last_contact_date": "2024-10-01"}]'
+    ```
+
+    LeadRev accepts an array of lead objects, so you can import one lead or thousands in a single request. For larger datasets, use the CSV import in **Settings → Imports** — download the template, fill in your data, and upload the file. See [Importing Leads](/importing-leads) for full details on required fields and CSV formatting.
+  </Step>
+  <Step title="Review risk detections">
+    After your leads are imported, LeadRev's risk engine runs automatically — no action required on your part. Within a few minutes, it evaluates every lead against your workspace's risk rules and flags any that are overdue, missing a next step, untouched beyond your contact threshold, or high-value deals showing signs of stalling.
+
+    Navigate to the **Recovery Queue** in the left sidebar to see your flagged leads. Each entry shows the lead name, deal value, risk type, days since last contact, and a priority score. Leads are sorted by urgency so the highest-risk, highest-value deals appear at the top.
+  </Step>
+  <Step title="Log your first contact">
+    Click any lead in the Recovery Queue to open its detail panel. Click **Log Contact** to record a recent interaction. Select the contact type — **Call**, **Email**, or **Meeting** — then enter the date of the interaction and any notes about what was discussed or agreed. Click **Save** to record the activity.
+
+    Logging a contact resets the lead's "days since last contact" counter and updates its health score. If the outreach resolves the risk flag, LeadRev automatically removes the lead from the Recovery Queue. If further follow-up is needed, click **Create Task** to set a due date and keep the deal moving forward.
+  </Step>
+</Steps>
+
+<Tip>
+  Now that your pipeline is live, take a few minutes to read through [Core Concepts](/concepts/revenue-intelligence) to understand how LeadRev scores lead health, defines risk categories, and calculates revenue at risk. Understanding these concepts will help you configure your risk rules to match your sales process and get the most accurate detections from day one.
+</Tip>

@@ -1,0 +1,94 @@
+---
+title: "Monitor Pipeline Health with the LeadRev Dashboard"
+sidebarTitle: "Pipeline Dashboard"
+description: "Use the LeadRev pipeline dashboard to track total pipeline value, revenue at risk, leakage exposure, and deal stage distribution across your team."
+---
+
+The Pipeline Dashboard gives revenue leaders a real-time view of pipeline health, showing total pipeline value, deals at risk, revenue leakage, and stage-level breakdowns so you can act before deals are lost. Rather than waiting for a weekly forecast call to discover that risk has crept into your pipeline, the dashboard surfaces problems continuously — turning pipeline management from a reactive exercise into a proactive one.
+
+## Dashboard Overview
+
+At the top of the Pipeline Dashboard, five metric cards summarize the current state of your pipeline. Each card updates in real time as leads are logged, scored, and moved through stages.
+
+<CardGroup cols={2}>
+  <Card title="Total Pipeline Value" icon="circle-dollar-to-slot">
+    The aggregate deal value of every active lead in your pipeline, regardless of risk tier or stage. This is your ceiling — the maximum revenue available if every deal closes.
+  </Card>
+  <Card title="Pipeline at Risk" icon="triangle-exclamation">
+    The total deal value of leads currently classified as At Risk or Critical. This is the portion of your pipeline that is actively deteriorating and needs intervention.
+  </Card>
+  <Card title="Revenue Leakage" icon="droplet">
+    The total deal value of Critical-tier leads that have exceeded the no-contact leakage window. These deals are leaking revenue in real time — the longer they go untouched, the lower their close probability.
+  </Card>
+  <Card title="Leads in Recovery Queue" icon="list-check">
+    The count of leads currently surfaced in the Recovery Queue across all risk categories. Use this number to gauge your team's daily action workload.
+  </Card>
+  <Card title="Average Lead Health Score" icon="heart-pulse">
+    The mean health score across all active leads in your pipeline (0–100). A declining average is an early warning sign that engagement is dropping across the board before individual deals hit Critical.
+  </Card>
+</CardGroup>
+
+## Pipeline at Risk Chart
+
+Below the metric cards, the **Pipeline at Risk Chart** plots the value of at-risk deals over a rolling time window. Use the selector in the top-right corner of the chart to toggle between the **last 7 days**, **last 30 days**, and **last 90 days**.
+
+The chart uses a stacked view to separate At Risk (amber) from Critical (red) pipeline value, so you can see not just how much is at risk but how severe the risk is. Key patterns to watch for:
+
+- A **steady upward trend** in Critical value suggests that deals are not being re-engaged once they enter the at-risk state — a coaching or process problem.
+- **Week-over-week spikes** often correspond to gaps in activity around weekends, holidays, or end-of-quarter scrambles when reps focus on closing and neglect earlier-stage deals.
+- A **declining trend** after a team initiative (such as a Recovery Queue blitz) confirms that the intervention worked and can be quantified in dollar terms.
+
+## Stage Distribution
+
+The **Stage Distribution** section presents a funnel view of your pipeline broken down by each pipeline stage. For every stage, LeadRev shows:
+
+- **Lead Count** — the number of active leads currently in that stage.
+- **Total Value** — the aggregate deal value of those leads.
+- **At Risk / Critical Breakdown** — within each stage, how many leads are At Risk or Critical, with the corresponding dollar value highlighted in amber and red.
+
+Stages with a high concentration of Critical leads are immediately visible — look for stages where the at-risk value represents more than 20–30% of the total stage value as a starting threshold for concern. Early-stage concentration of risk often signals a qualification problem; late-stage concentration often signals a closing execution problem.
+
+## Team Leaderboard
+
+The **Team Leaderboard** provides a per-owner breakdown of pipeline performance, making it easy for managers to identify coaching opportunities, workload imbalances, and top performers.
+
+For each team member, the leaderboard displays:
+
+- **Leads Owned** — the total number of active leads assigned to the rep.
+- **Average Health Score** — the mean health score across all of their leads. A low average relative to peers often points to inconsistent logging or a challenging book of business that needs support.
+- **Pipeline Value Owned** — the total deal value under the rep's ownership.
+- **Queue Backlog** — the number of leads in the rep's Recovery Queue. A growing backlog suggests the rep is not working through at-risk deals fast enough relative to new ones entering the queue.
+
+Use the leaderboard in your 1:1s to open data-driven conversations about activity habits and deal health rather than relying on anecdotal feedback.
+
+## Filtering the Dashboard
+
+Every section of the Pipeline Dashboard responds to the global filter bar at the top of the page. Available filters include:
+
+- **Date Range** — scope all metrics to a specific time window (custom, last 7/30/90 days, or quarter-to-date).
+- **Owner** — isolate the dashboard to one or more team members. Managers can use this to prepare rep-specific pipeline reviews.
+- **Pipeline Stage** — focus the stage distribution, leaderboard, and at-risk chart on a specific stage or group of stages.
+- **Risk Tier** — filter all views to show only Critical, At Risk, or Healthy leads.
+
+Once you have configured a useful filter combination, click **Export** in the top-right corner to download the current dashboard view as a **CSV** (for further analysis in a spreadsheet) or a **PDF** (for sharing in a presentation or async communication).
+
+## Interpreting the Data
+
+Raw numbers become actionable when you connect them to a specific question. Here are three concrete examples of how to move from a dashboard observation to an action.
+
+1. **Leakage value is climbing week over week.** Open the Stage Distribution section and look for which stage has the highest concentration of Critical leads. If it's concentrated in one stage, investigate whether deals are stalling there due to a process gap — for example, no clear handoff from discovery to demo, or proposals going out without a follow-up cadence. Then open [Detecting Leakage](/guides/detecting-leakage) to work through the individual deals.
+
+2. **A team member's average health score is significantly lower than peers.** Open the Activity Timeline for two or three of their lowest-scoring leads. If the common thread is infrequent contact logging or missing next steps, schedule a coaching session focused on logging habits rather than deal strategy. The problem is likely process, not pipeline.
+
+3. **Pipeline at risk spikes sharply after a previously stable period.** Cross-reference the spike date with the [Recovery Queue](/guides/working-recovery-queue) — filter the queue by the date range of the spike and sort by days since last contact. You'll typically find a cluster of deals that went untouched during a specific period (a holiday week, a team offsite, a product launch sprint). Use the bulk action tools to mass-assign tasks and re-engage the cluster at once.
+
+<Tip>
+  Share the dashboard link — filtered to your team's date range and stage — with your VP of Sales at the start of each week for an async pipeline review. Attach a two-sentence written summary of the top risk and the planned action. This keeps leadership informed without scheduling a meeting, and creates a written record of pipeline decisions over time.
+</Tip>
+
+## Related Resources
+
+- [Detecting Revenue Leakage](/guides/detecting-leakage) — drill into the specific deals driving your leakage number.
+- [Working the Recovery Queue](/guides/working-recovery-queue) — take action on the at-risk leads surfaced in the dashboard.
+- [Pipeline Risk concepts](/concepts/pipeline-risk) — understand how LeadRev calculates and categorizes pipeline risk.
+- [API: Pipeline](/api/pipeline) — retrieve pipeline metrics and at-risk data programmatically.

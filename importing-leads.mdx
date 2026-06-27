@@ -1,0 +1,191 @@
+---
+title: "Import Leads into LeadRev via CSV, CRM, or REST API"
+sidebarTitle: "Import Leads"
+description: "Learn how to import leads into LeadRev via CSV upload, CRM sync, or the REST API, with full details on required fields and data formatting."
+---
+
+There are three ways to get leads into LeadRev: a CSV upload through the dashboard, an automatic sync from a connected CRM, or a direct call to the REST API. All three methods feed the same risk detection engine, so the approach you choose depends on your workflow rather than the quality of detections you'll receive. The more data you provide for each lead — particularly `last_contact_date`, `next_step`, and `deal_value` — the more precise and actionable LeadRev's risk analysis will be. Sparse records will still be detected as at-risk, but richer data lets LeadRev distinguish between genuinely stalled deals and leads that are simply early in the sales cycle.
+
+## Required Fields
+
+These are the fields LeadRev accepts when importing a lead. Fields marked as required must be present for the lead to be created successfully.
+
+<ParamField body="name" type="string" required>
+  The name of the company or lead. Used as the primary identifier for deduplication. For example: `"Acme Corp"`.
+</ParamField>
+
+<ParamField body="owner" type="string" required>
+  The email address of the sales rep or account owner responsible for this lead. Must match a user in your LeadRev workspace. For example: `"jane@company.com"`.
+</ParamField>
+
+<ParamField body="stage" type="string" required>
+  The current deal stage. Must match one of the stages configured in your workspace (for example: `"Prospecting"`, `"Proposal"`, `"Negotiation"`). Stage is used to calculate time-in-stage risk and expected close date thresholds.
+</ParamField>
+
+<ParamField body="deal_value" type="number">
+  The estimated value of the deal in your workspace's default currency. Used to calculate revenue at risk and to weight lead priority in the Recovery Queue. For example: `25000`.
+</ParamField>
+
+<ParamField body="last_contact_date" type="string">
+  The date of the most recent interaction with this lead, in ISO 8601 format (`YYYY-MM-DD`). This is the primary input for overdue and untouched risk detections. For example: `"2024-10-01"`.
+</ParamField>
+
+<ParamField body="next_step" type="string">
+  A free-text description of the next planned action for this deal. If this field is empty, LeadRev flags the lead as a **No Next Step** risk. For example: `"Send revised proposal by Friday"`.
+</ParamField>
+
+<ParamField body="created_date" type="string">
+  The date the lead was originally created, in ISO 8601 format (`YYYY-MM-DD`). Used to calculate total days in pipeline and time-in-stage metrics. Defaults to the import date if not provided. For example: `"2024-08-15"`.
+</ParamField>
+
+## CSV Import
+
+CSV import is the fastest way to bring an existing pipeline into LeadRev without writing any code. Use this method when migrating from a spreadsheet, exporting from a CRM that doesn't have a native LeadRev integration, or doing a one-time bulk import.
+
+<Steps>
+  <Step title="Download the CSV template">
+    In LeadRev, navigate to **Settings → Imports**. Click **Download CSV Template** to get a pre-formatted file with all supported column headers. Using the template avoids column mapping issues and ensures your data is validated correctly on upload.
+  </Step>
+  <Step title="Fill in your lead data">
+    Open the template in your spreadsheet tool of choice and populate it with your lead data. Each row represents one lead. The `name`, `owner`, and `stage` columns are required — all other columns are optional but recommended. Leave optional cells blank rather than inserting placeholder text, which can interfere with date parsing and risk scoring.
+  </Step>
+  <Step title="Upload your file">
+    Return to **Settings → Imports → Upload CSV** and select your completed file. LeadRev validates the file on upload and will surface any rows with missing required fields or formatting errors before the import runs. Fix any flagged issues and re-upload if needed.
+  </Step>
+  <Step title="Map columns if needed">
+    If you uploaded a file that doesn't use the template headers, LeadRev's column mapper lets you match your file's columns to the correct LeadRev fields. Use the dropdown next to each detected column to assign it to the appropriate field. You can save a mapping profile for reuse on future imports from the same source.
+  </Step>
+  <Step title="Confirm and import">
+    Review the import preview, which shows the first ten rows of your data and a count of total records. Confirm the import to begin processing. Large files may take a minute or two to complete. LeadRev sends an email notification when the import finishes, along with a summary of records created, updated, and any rows that failed validation.
+  </Step>
+</Steps>
+
+<Warning>
+  If a lead in your CSV has the same `name` and `owner` combination as an existing lead in your workspace, LeadRev **merges** the incoming record with the existing one rather than creating a duplicate. Fields present in the CSV overwrite the existing values. Fields left blank in the CSV do not overwrite existing data. If you want to create separate leads for the same company under different owners, ensure the `owner` field differs between records.
+</Warning>
+
+## CRM Sync
+
+LeadRev integrates natively with **Salesforce** and **HubSpot**. Once you connect your CRM from **Settings → Integrations**, LeadRev syncs your leads and opportunities on an automatic schedule — typically every hour, though you can trigger a manual sync at any time from the Integrations settings page. Field values, stage changes, and contact activity logged in your CRM are reflected in LeadRev automatically, keeping your risk detections current without any manual effort. For setup instructions, supported objects, and sync frequency configuration, see the [Integrations guide](/configuration/integrations).
+
+## API Import
+
+The REST API gives you full programmatic control over lead imports. Use it to build real-time sync pipelines, connect LeadRev to your existing sales stack, or automate lead creation as part of a larger workflow.
+
+Send a `POST` request to `/v1/leads` with an array of lead objects in the request body. You can import up to 500 leads per request.
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.leadrev.ai/v1/leads \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '[
+    {
+      "name": "Acme Corp",
+      "owner": "jane@company.com",
+      "deal_value": 25000,
+      "stage": "Proposal",
+      "last_contact_date": "2024-10-01",
+      "next_step": "Follow up on revised proposal",
+      "created_date": "2024-08-15"
+    },
+    {
+      "name": "Globex Industries",
+      "owner": "mark@company.com",
+      "deal_value": 87000,
+      "stage": "Negotiation",
+      "last_contact_date": "2024-09-18",
+      "created_date": "2024-07-02"
+    }
+  ]'
+```
+
+```javascript JavaScript
+const response = await fetch("https://api.leadrev.ai/v1/leads", {
+  method: "POST",
+  headers: {
+    "Authorization": "Bearer YOUR_API_KEY",
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify([
+    {
+      name: "Acme Corp",
+      owner: "jane@company.com",
+      deal_value: 25000,
+      stage: "Proposal",
+      last_contact_date: "2024-10-01",
+      next_step: "Follow up on revised proposal",
+      created_date: "2024-08-15",
+    },
+    {
+      name: "Globex Industries",
+      owner: "mark@company.com",
+      deal_value: 87000,
+      stage: "Negotiation",
+      last_contact_date: "2024-09-18",
+      created_date: "2024-07-02",
+    },
+  ]),
+});
+
+const result = await response.json();
+console.log(result);
+```
+
+</CodeGroup>
+
+A successful import returns a summary object:
+
+```json
+{
+  "imported": 42,
+  "updated": 3,
+  "errors": []
+}
+```
+
+The `imported` count reflects newly created leads, `updated` reflects records merged with existing leads, and `errors` is an array of objects describing any rows that failed validation, each including the lead name and the reason for failure.
+
+## Retrieving and Updating Leads via API
+
+Once leads are in LeadRev, you can query and update them programmatically using the REST API. The following endpoints are available in addition to the import endpoint above.
+
+**List leads** — `GET /v1/leads`
+
+Returns a paginated list of all leads in your workspace. Use query parameters to filter results by owner, stage, risk status, or deal value range.
+
+```bash
+curl -X GET "https://api.leadrev.ai/v1/leads?stage=Proposal&owner=jane@company.com" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+**Get a single lead** — `GET /v1/leads/{id}`
+
+Returns the full record for a specific lead by its unique identifier.
+
+```bash
+curl -X GET https://api.leadrev.ai/v1/leads/lead_abc123 \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+**Update a lead** — `PATCH /v1/leads/{id}`
+
+Updates one or more fields on an existing lead. Only the fields you include in the request body are changed; all other fields retain their current values.
+
+```bash
+curl -X PATCH https://api.leadrev.ai/v1/leads/lead_abc123 \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"stage": "Negotiation", "next_step": "Send final contract by Friday", "deal_value": 32000}'
+```
+
+A successful `PATCH` returns the updated lead object. Updating `last_contact_date`, `next_step`, or `stage` triggers an immediate re-evaluation by the risk engine, which may resolve or create risk flags and update the lead's position in the Recovery Queue.
+
+## Field Mapping
+
+If your CRM uses custom field names that don't match LeadRev's standard schema, you can create a field mapping to translate them automatically. Navigate to **Settings → Field Mapping** to define mappings between your CRM's custom fields and LeadRev's lead fields. For example, if your Salesforce instance stores deal value in a custom field called `Expected_ARR__c`, you can map that field to `deal_value` so it populates correctly on every sync. Mappings apply to both CRM syncs and API imports when you pass the `field_mapping_profile` parameter in your request.
+
+<Info>
+  Risk detection runs automatically within a few minutes of every import — whether you use CSV, CRM sync, or the API. You don't need to trigger it manually. Once the analysis completes, any newly flagged leads appear immediately in your Recovery Queue.
+</Info>

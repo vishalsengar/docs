@@ -1,0 +1,74 @@
+---
+title: "Configure Risk Thresholds and Leakage Rules in LeadRev"
+sidebarTitle: "Risk Thresholds"
+description: "Customize LeadRev's risk detection thresholds, leakage windows, and deal value rules to match your team's sales cycle and follow-up cadence."
+---
+
+LeadRev ships with sensible default risk thresholds, but every sales team has different follow-up cadences and deal cycles. Adjusting these settings lets you align LeadRev's health scoring engine with how your team actually works — whether you close deals in two weeks or six months.
+
+## Accessing Risk Settings
+
+Navigate to **Settings → Risk & Thresholds** to manage all threshold configuration. Only workspace Admins can modify these settings. Representatives and managers can view the current thresholds but cannot change them.
+
+## Contact Recency Thresholds
+
+Contact recency is the primary driver of a lead's risk tier. LeadRev tracks the last logged contact activity for each lead and compares it against your configured thresholds to assign a tier: **Healthy**, **At Risk**, or **Critical**.
+
+| Setting | Default | Valid Range | Description |
+|---|---|---|---|
+| At Risk Threshold | 14 days | 1 – 90 days | Days without contact before a lead moves to At Risk |
+| Critical Threshold | 30 days | At Risk value – 180 days | Days without contact before a lead moves to Critical |
+| Leakage Window | 30 days | 1 – 180 days | Days a lead can remain in Critical with no engagement before it is counted as revenue leakage |
+
+The Critical threshold must always be greater than the At Risk threshold. LeadRev enforces this constraint when you save.
+
+## Next Step Rules
+
+When a lead has no next step set, LeadRev applies an additional risk weight to its health score calculation. This penalizes leads that have slipped through without a clear follow-up action, even if they were contacted recently.
+
+You can configure the severity of this penalty:
+
+- **Low** — minor deduction; the lead can still score Healthy if recently contacted
+- **Medium** — moderate deduction; a recently contacted lead with no next step scores At Risk
+- **High** — significant deduction; no next step strongly pushes a lead toward Critical regardless of recency
+
+Set the no-next-step severity in **Settings → Risk & Thresholds → Next Step Weight**. The default is **Medium**.
+
+## Deal Value Tiers
+
+High-value deals carry more revenue risk when they go cold, so LeadRev lets you configure an elevated priority multiplier for leads above a set deal value.
+
+**High Value Threshold** — default **$10,000**. Any lead with a deal value at or above this amount receives a risk multiplier that raises its effective health score penalty, making it more likely to surface at the top of your Recovery Queue.
+
+You can set the multiplier itself between **1.1×** and **3.0×**. The default multiplier is **1.5×**.
+
+To change these values, go to **Settings → Risk & Thresholds → Deal Value Tiers** and update the threshold and multiplier fields, then click **Save**.
+
+## Stage-Specific Rules
+
+Some pipeline stages move faster than others. A lead sitting in **Proposal** for 10 days without contact is far more concerning than a lead in **Prospecting** sitting for the same duration. Stage-specific rules let you override the global contact recency thresholds for individual stages.
+
+<Steps>
+  <Step title="Open Stage Rules">
+    In **Settings → Risk & Thresholds**, scroll to the **Stage-Specific Rules** section and click **Add Stage Rule**.
+  </Step>
+  <Step title="Select a Stage">
+    Choose the pipeline stage you want to override from the dropdown. Each stage can have at most one rule.
+  </Step>
+  <Step title="Set a Custom Contact Recency Threshold">
+    Enter the number of days without contact before leads in this stage are marked At Risk. For example, set **Proposal** to **7 days** to tighten follow-up expectations for late-stage deals.
+  </Step>
+  <Step title="Save the Rule">
+    Click **Save Rule**. The new threshold takes effect immediately and overrides the global At Risk threshold for all leads currently in that stage.
+  </Step>
+</Steps>
+
+You can add as many stage rules as you need and edit or delete them at any time from the same panel.
+
+## Resetting to Defaults
+
+If your threshold configuration has drifted and you want a clean slate, click the **Reset to Defaults** button at the bottom of **Settings → Risk & Thresholds**. This restores all global thresholds, the no-next-step severity, the deal value tier settings, and all stage-specific rules to their factory defaults. This action is workspace-wide and cannot be undone.
+
+<Warning>
+  Changing thresholds — including a reset to defaults — will immediately re-evaluate all existing leads against the new values. Your Recovery Queue will reflect the updated risk tiers within minutes. Leads may move in or out of the queue as a result, so communicate threshold changes to your team before making them.
+</Warning>

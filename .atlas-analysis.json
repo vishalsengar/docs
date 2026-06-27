@@ -1,0 +1,108 @@
+{
+  "projectType": "saas",
+  "projectName": "LeadRev",
+  "projectDescription": "LeadRev is a B2B Revenue Intelligence platform that helps sales teams detect overdue leads, recover stalled deals, and eliminate revenue leakage from imported pipeline data.",
+  "theme": "almond",
+  "primaryColor": "#ef7025",
+  "lightColor": "#eec9bc",
+  "darkColor": "#4fa1ab",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "importing-leads"
+            ]
+          },
+          {
+            "group": "Core Concepts",
+            "pages": [
+              "concepts/revenue-intelligence",
+              "concepts/lead-health",
+              "concepts/recovery-queue",
+              "concepts/pipeline-risk"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/detecting-leakage",
+              "guides/working-recovery-queue",
+              "guides/logging-contact",
+              "guides/tasks-and-follow-ups",
+              "guides/pipeline-dashboard"
+            ]
+          },
+          {
+            "group": "Configuration",
+            "pages": [
+              "configuration/risk-thresholds",
+              "configuration/notifications",
+              "configuration/integrations"
+            ]
+          },
+          {
+            "group": "Help",
+            "pages": [
+              "faq",
+              "troubleshooting"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "api/overview",
+              "api/authentication"
+            ]
+          },
+          {
+            "group": "Endpoints",
+            "pages": [
+              "api/leads",
+              "api/recovery-queue",
+              "api/contacts",
+              "api/tasks",
+              "api/pipeline"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Lead import via CSV, CRM sync, or API",
+    "Automated detection of overdue, untouched, and no-next-step leads",
+    "Recovery Queue: prioritized list of at-risk leads requiring action",
+    "Lead health and risk scoring with configurable thresholds",
+    "Contact log: record calls, emails, and meetings directly on leads",
+    "Task creation and follow-up scheduling",
+    "Revenue leakage dashboard showing pipeline at risk",
+    "Pipeline health overview with deal stage analytics",
+    "Configurable risk rules and notification alerts",
+    "CRM and calendar integrations"
+  ],
+  "publicApiSurface": [
+    "POST /api/leads — import or upsert leads",
+    "GET /api/leads — list leads with filters (status, risk, stage)",
+    "GET /api/leads/{id} — get a single lead with health/risk data",
+    "PATCH /api/leads/{id} — update lead status or metadata",
+    "GET /api/recovery-queue — list prioritized recovery queue",
+    "POST /api/contacts — log a contact activity on a lead",
+    "GET /api/contacts — list contact history for a lead",
+    "POST /api/tasks — create a follow-up task",
+    "GET /api/tasks — list tasks (by lead, assignee, due date)",
+    "PATCH /api/tasks/{id} — update or complete a task",
+    "GET /api/pipeline — get pipeline summary and leakage metrics",
+    "GET /api/pipeline/at-risk — list leads contributing to revenue leakage"
+  ]
+}

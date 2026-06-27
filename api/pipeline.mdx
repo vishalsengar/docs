@@ -1,0 +1,213 @@
+---
+title: "Pipeline API: Revenue Metrics, Leakage, and At-Risk Deals"
+sidebarTitle: "Pipeline"
+description: "API endpoints for retrieving pipeline health metrics, total value at risk, revenue leakage exposure, and stage-level deal distribution."
+---
+
+The Pipeline endpoints give you programmatic access to your revenue metrics — total pipeline value, at-risk deal value, leakage exposure, and stage breakdowns — for use in custom dashboards, BI tools, or executive reports. Unlike the Leads endpoints, these endpoints return aggregate views designed for high-level reporting rather than individual lead management.
+
+---
+
+## GET /v1/pipeline — Get Pipeline Summary
+
+Returns a snapshot of your workspace's pipeline health, including total deal values segmented by risk tier, revenue leakage exposure, and a stage-by-stage breakdown of deal distribution.
+
+### Query Parameters
+
+<ParamField query="owner" type="string">
+  Filter the pipeline summary to leads owned by a specific team member, identified by their email address. Useful for per-rep performance views.
+</ParamField>
+
+<ParamField query="stage" type="string">
+  Filter the summary to leads in a specific pipeline stage. Must match your workspace's configured stage names exactly.
+</ParamField>
+
+### Response Fields
+
+<ResponseField name="total_pipeline_value" type="number">
+  The combined `deal_value` (in USD) of all active leads in your workspace, regardless of risk tier.
+</ResponseField>
+
+<ResponseField name="pipeline_at_risk" type="number">
+  The combined `deal_value` (in USD) of all leads classified as `at_risk` or `critical`. This is the portion of your pipeline that is actively at risk of going dark.
+</ResponseField>
+
+<ResponseField name="revenue_leakage" type="number">
+  The combined `deal_value` (in USD) of leads classified as `critical` that have exceeded your workspace's configured leakage window (no contact beyond the maximum allowed days for their stage). These deals are considered leaking revenue.
+</ResponseField>
+
+<ResponseField name="healthy_count" type="integer">
+  The total number of leads currently classified as `healthy`.
+</ResponseField>
+
+<ResponseField name="at_risk_count" type="integer">
+  The total number of leads currently classified as `at_risk`.
+</ResponseField>
+
+<ResponseField name="critical_count" type="integer">
+  The total number of leads currently classified as `critical`.
+</ResponseField>
+
+<ResponseField name="average_health_score" type="number">
+  The mean health score across all active leads in the filtered view, rounded to one decimal place.
+</ResponseField>
+
+<ResponseField name="stage_breakdown" type="array">
+  An array of objects, one per pipeline stage, showing deal distribution and risk exposure at each stage.
+
+  <Expandable title="stage_breakdown item fields">
+    <ResponseField name="stage" type="string">
+      The pipeline stage name.
+    </ResponseField>
+
+    <ResponseField name="count" type="integer">
+      The total number of leads in this stage.
+    </ResponseField>
+
+    <ResponseField name="total_value" type="number">
+      The combined `deal_value` (in USD) of all leads in this stage.
+    </ResponseField>
+
+    <ResponseField name="at_risk_count" type="integer">
+      The number of leads in this stage classified as `at_risk` or `critical`.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<Warning>
+  `revenue_leakage` is computed based on your workspace's configured leakage thresholds per stage. If you have not configured stage thresholds, this value defaults to the `deal_value` of all `critical` leads. Review your workspace settings to ensure leakage calculations reflect your actual sales cycle.
+</Warning>
+
+<CodeGroup>
+
+```bash cURL — Full Pipeline Summary
+curl https://api.leadrev.ai/v1/pipeline \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```bash cURL — Filtered by Owner
+curl -G https://api.leadrev.ai/v1/pipeline \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  --data-urlencode "owner=sarah@yourcompany.com"
+```
+
+```json Response
+{
+  "total_pipeline_value": 1840000,
+  "pipeline_at_risk": 412500,
+  "revenue_leakage": 187000,
+  "healthy_count": 64,
+  "at_risk_count": 11,
+  "critical_count": 7,
+  "average_health_score": 61.4,
+  "stage_breakdown": [
+    {
+      "stage": "Discovery",
+      "count": 28,
+      "total_value": 490000,
+      "at_risk_count": 5
+    },
+    {
+      "stage": "Proposal",
+      "count": 21,
+      "total_value": 620000,
+      "at_risk_count": 8
+    },
+    {
+      "stage": "Negotiation",
+      "count": 14,
+      "total_value": 510000,
+      "at_risk_count": 4
+    },
+    {
+      "stage": "Legal Review",
+      "count": 9,
+      "total_value": 220000,
+      "at_risk_count": 1
+    }
+  ]
+}
+```
+
+</CodeGroup>
+
+---
+
+## GET /v1/pipeline/at-risk — List At-Risk Leads
+
+Returns the full paginated list of leads contributing to your `pipeline_at_risk` value — all leads currently classified as `at_risk` or `critical`. The response shape is identical to `GET /v1/leads`, with the `risk_tier` filter permanently set to include both `at_risk` and `critical` leads.
+
+Use this endpoint when you need the individual lead records behind your pipeline risk number, for example to populate a risk report, feed a Slack alert, or sync at-risk leads to an external CRM view.
+
+<Note>
+  The `risk_tier` filter is locked to `at_risk` and `critical` for this endpoint. Passing a `risk_tier` query parameter of `healthy` has no effect and returns an empty result set.
+</Note>
+
+### Query Parameters
+
+<ParamField query="owner" type="string">
+  Filter at-risk leads to a specific team member by email address.
+</ParamField>
+
+<ParamField query="stage" type="string">
+  Filter at-risk leads to a specific pipeline stage.
+</ParamField>
+
+<ParamField query="page" type="integer">
+  The page number to return. Defaults to `1`.
+</ParamField>
+
+<ParamField query="per_page" type="integer">
+  The number of leads to return per page. Defaults to `50`. Maximum is `100`.
+</ParamField>
+
+<CodeGroup>
+
+```bash cURL — All At-Risk Leads
+curl https://api.leadrev.ai/v1/pipeline/at-risk \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```bash cURL — Filtered by Stage
+curl -G https://api.leadrev.ai/v1/pipeline/at-risk \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  --data-urlencode "stage=Proposal" \
+  --data-urlencode "per_page=25"
+```
+
+```json Response
+{
+  "data": [
+    {
+      "id": "lead_8fKz2mQp",
+      "name": "Acme Corp",
+      "owner": "sarah@yourcompany.com",
+      "stage": "Proposal",
+      "deal_value": 48000,
+      "health_score": 28,
+      "risk_tier": "critical",
+      "last_contact_date": "2024-10-05",
+      "next_step": "Send revised pricing deck"
+    },
+    {
+      "id": "lead_3nWx9rTv",
+      "name": "Globex Industries",
+      "owner": "james@yourcompany.com",
+      "stage": "Discovery",
+      "deal_value": 22500,
+      "health_score": 41,
+      "risk_tier": "at_risk",
+      "last_contact_date": "2024-11-01",
+      "next_step": "Schedule technical demo"
+    }
+  ],
+  "meta": {
+    "page": 1,
+    "per_page": 25,
+    "total": 18,
+    "total_pages": 1
+  }
+}
+```
+
+</CodeGroup>

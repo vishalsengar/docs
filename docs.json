@@ -1,0 +1,94 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "name": "LeadRev",
+  "theme": "almond",
+  "colors": {
+    "primary": "#ef7025",
+    "light": "#eec9bc",
+    "dark": "#4fa1ab"
+  },
+  "favicon": "/favicon.svg",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "importing-leads"
+            ]
+          },
+          {
+            "group": "Core Concepts",
+            "pages": [
+              "concepts/revenue-intelligence",
+              "concepts/lead-health",
+              "concepts/recovery-queue",
+              "concepts/pipeline-risk"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/detecting-leakage",
+              "guides/working-recovery-queue",
+              "guides/logging-contact",
+              "guides/tasks-and-follow-ups",
+              "guides/pipeline-dashboard"
+            ]
+          },
+          {
+            "group": "Configuration",
+            "pages": [
+              "configuration/risk-thresholds",
+              "configuration/notifications",
+              "configuration/integrations"
+            ]
+          },
+          {
+            "group": "Help",
+            "pages": [
+              "faq",
+              "troubleshooting"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "api/overview",
+              "api/authentication"
+            ]
+          },
+          {
+            "group": "Endpoints",
+            "pages": [
+              "api/leads",
+              "api/recovery-queue",
+              "api/contacts",
+              "api/tasks",
+              "api/pipeline"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "navbar": {
+    "primary": {
+      "type": "button",
+      "label": "Get Started",
+      "href": "/introduction"
+    }
+  },
+  "footer": {
+    "socials": {}
+  }
+}

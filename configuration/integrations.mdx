@@ -1,0 +1,140 @@
+---
+title: "Connect LeadRev to Your CRM, Calendar, and Sales Tools"
+sidebarTitle: "Integrations"
+description: "Sync leads from Salesforce or HubSpot, connect your calendar, and use Zapier or webhooks to integrate LeadRev with your existing sales stack."
+---
+
+LeadRev integrates with the tools your team already uses — pulling leads from your CRM automatically, syncing contact activity back, and triggering workflows in external systems via webhooks. All integrations are managed from **Settings → Integrations** and require Admin access to connect or disconnect.
+
+## Salesforce Integration
+
+The Salesforce integration syncs Leads and Opportunities from your Salesforce org into LeadRev and writes contact activity back to Salesforce records, keeping both systems in sync.
+
+<Steps>
+  <Step title="Open the Salesforce Integration">
+    Navigate to **Settings → Integrations → Salesforce** and click **Connect**.
+  </Step>
+  <Step title="Authenticate with Salesforce">
+    You will be redirected to Salesforce's OAuth flow. Sign in with your **Salesforce admin credentials** to authorize LeadRev. Non-admin Salesforce accounts may not have permission to grant the necessary data access.
+  </Step>
+  <Step title="Select Objects to Sync">
+    Choose which Salesforce objects LeadRev should import: **Leads**, **Opportunities**, or both. You can change this selection later without reconnecting.
+  </Step>
+  <Step title="Map Salesforce Fields to LeadRev Fields">
+    LeadRev will auto-map standard fields (Name, Email, Stage, Deal Value, Owner). Review the mapping and adjust any custom fields your org uses. Required LeadRev fields — `name`, `owner`, and `stage` — must be mapped before you can save.
+  </Step>
+  <Step title="Set Sync Frequency">
+    Choose between **Real-time** (changes in Salesforce appear in LeadRev within seconds via webhook) or **Hourly** (a scheduled batch pull every 60 minutes). Real-time sync requires the LeadRev Salesforce app to be installed in your org.
+  </Step>
+  <Step title="Save the Integration">
+    Click **Save**. LeadRev will run an initial import of all matching records. Depending on your data volume, the first sync may take several minutes.
+  </Step>
+</Steps>
+
+<Note>
+  Real-time Salesforce sync requires the **LeadRev Salesforce App** to be installed in your Salesforce org. You can find it on the [Salesforce AppExchange](https://appexchange.salesforce.com) by searching for "LeadRev". Install it before enabling real-time sync frequency.
+</Note>
+
+## HubSpot Integration
+
+The HubSpot integration connects LeadRev to your HubSpot Contacts and Deals. The sync is **bidirectional** — new and updated records flow into LeadRev, and contact activities you log in LeadRev (calls, emails, meetings) are written back to the corresponding HubSpot timeline automatically.
+
+<Steps>
+  <Step title="Open the HubSpot Integration">
+    Navigate to **Settings → Integrations → HubSpot** and click **Connect**.
+  </Step>
+  <Step title="Authenticate with HubSpot">
+    You will be redirected to HubSpot's OAuth consent screen. Approve the requested scopes and return to LeadRev. You must be a **Super Admin** in your HubSpot portal to authorize the connection.
+  </Step>
+  <Step title="Select Objects to Sync">
+    Choose **Contacts**, **Deals**, or both. Deal records map to LeadRev leads, with the deal amount used as the deal value.
+  </Step>
+  <Step title="Map Fields and Set Sync Frequency">
+    Review the field mapping and set your preferred sync frequency (real-time or hourly), then click **Save**.
+  </Step>
+</Steps>
+
+<Tip>
+  Use the HubSpot integration to avoid double-logging contact activity. When you log a call, email, or meeting in LeadRev, it appears in the HubSpot contact timeline automatically — so your CRM stays current without any extra effort.
+</Tip>
+
+## Calendar Integration
+
+Connect Google Calendar or Microsoft Outlook to let LeadRev automatically log meeting activity on your leads. When a calendar event includes a lead's email address as an attendee, LeadRev creates a **Meeting** contact activity on that lead's timeline at the scheduled time.
+
+To connect your calendar, go to **Settings → Integrations → Calendar** and click **Connect Google Calendar** or **Connect Outlook**, then complete the OAuth flow.
+
+Once connected:
+
+- Upcoming meetings with known lead emails are queued for automatic logging.
+- Past meetings (up to 30 days back) are imported on first connection.
+- Cancellations and reschedules are reflected automatically.
+- You can disconnect the calendar at any time without losing previously logged activities.
+
+## Webhooks
+
+LeadRev sends real-time webhook payloads to your endpoint whenever key events occur, enabling you to build custom workflows, update external systems, or trigger automations.
+
+**Supported webhook events:**
+
+| Event | Description |
+|---|---|
+| `lead.risk_changed` | A lead's risk tier changes (e.g., Healthy → At Risk) |
+| `lead.entered_queue` | A lead is added to the Recovery Queue |
+| `lead.exited_queue` | A lead is removed from the Recovery Queue |
+| `task.created` | A new task is created on a lead |
+| `task.completed` | A task is marked complete |
+| `contact.logged` | A contact activity is logged on a lead |
+
+**Sample webhook payload:**
+
+```json
+{
+  "event": "lead.risk_changed",
+  "timestamp": "2024-11-15T10:30:00Z",
+  "data": {
+    "lead_id": "lead_abc123",
+    "previous_tier": "healthy",
+    "new_tier": "at_risk",
+    "health_score": 52,
+    "deal_value": 25000
+  }
+}
+```
+
+**To configure a webhook endpoint:**
+
+<Steps>
+  <Step title="Open Webhook Settings">
+    Navigate to **Settings → Integrations → Webhooks** and click **Add Endpoint**.
+  </Step>
+  <Step title="Enter Your Endpoint URL">
+    Paste the publicly accessible HTTPS URL where LeadRev should POST events. HTTP endpoints are not accepted.
+  </Step>
+  <Step title="Select Events">
+    Check the events you want this endpoint to receive. You can register multiple endpoints with different event selections.
+  </Step>
+  <Step title="Save and Verify">
+    Click **Save**. LeadRev will immediately send a test ping to your endpoint. Confirm your endpoint returns a `200` response — the delivery log will show the result.
+  </Step>
+</Steps>
+
+All webhook requests include a `X-LeadRev-Signature` header containing an HMAC-SHA256 signature of the request body, signed with your endpoint's secret. Verify this signature before processing the payload.
+
+## Zapier
+
+LeadRev's Zapier app lets you connect LeadRev to thousands of other tools without writing code. Find it by searching **"LeadRev"** in Zapier's app directory.
+
+Available **triggers** (events in LeadRev that start a Zap):
+- Lead Enters Queue
+- Task Created
+
+Available **actions** (things Zapier can do in LeadRev):
+- Create Lead
+- Log Contact Activity
+
+Use Zapier to do things like: create a LeadRev task whenever a deal is updated in your CRM, or send a Slack message when a high-value lead enters the queue — without needing custom webhook code.
+
+<Info>
+  All integrations respect LeadRev's role-based access controls. Only workspace **Admins** can connect, configure, or disconnect integrations. Managers and representatives can view integration status but cannot make changes.
+</Info>

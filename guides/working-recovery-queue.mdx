@@ -1,0 +1,98 @@
+---
+title: "Work the Recovery Queue to Re-Engage Stalled Deals"
+sidebarTitle: "Recovery Queue"
+description: "A step-by-step guide to reviewing, prioritizing, and acting on at-risk leads in the LeadRev Recovery Queue to recover stalled deals."
+---
+
+The Recovery Queue is your daily action list in LeadRev. It surfaces every lead that needs attention right now — overdue, untouched, no-next-step, or deteriorating in health — ranked so the highest-impact opportunities sit at the top. This guide walks through how to open, review, filter, and act on leads in the queue efficiently so your team spends time on the deals most worth saving. For background on how the queue is built, see [Recovery Queue concepts](/concepts/recovery-queue).
+
+## Opening the Recovery Queue
+
+Click **Recovery Queue** in the left sidebar. LeadRev loads your personalized queue, scoped by default to leads you own or that your team owns (depending on your role).
+
+At the top of the page, a summary bar displays:
+
+- **Total Leads in Queue** — the count of leads currently flagged across all risk categories.
+- **Total Value at Risk** — the aggregate deal value of every lead in the queue. This is the dollar figure your team can recover with focused action.
+
+Below the summary bar, the ranked lead list begins. Leads are ordered by a combination of risk tier and deal value — Critical-tier, high-value leads always surface first.
+
+## Understanding the Lead Cards
+
+Each lead in the queue is represented by a card containing the key context you need to act without clicking into the detail view.
+
+- **Lead Name & Company** — who the lead is and what organization they belong to.
+- **Owner** — the team member responsible for the lead.
+- **Risk Tier Badge** — color-coded: red for **Critical**, amber for **At Risk**.
+- **Health Score** — a 0–100 score reflecting overall engagement and activity recency. Lower scores indicate higher urgency.
+- **Deal Value** — the opportunity's total value in your configured currency.
+- **Days Since Last Contact** — how long it has been since any contact activity was logged.
+- **Next Step Status** — whether a next step has been set. Missing next steps are flagged inline on the card.
+
+## Filtering the Queue
+
+Use filters to focus on the slice of the queue most relevant to you — especially useful for managers reviewing a specific rep's book of business or for reps managing a large pipeline.
+
+<Steps>
+  <Step title="Click the Filters button">
+    At the top right of the lead list, click **Filters** to open the filter panel.
+  </Step>
+  <Step title="Filter by Owner">
+    Select one or more team members from the **Owner** dropdown to narrow the queue to their assigned leads. Managers can use this to review an individual rep's backlog.
+  </Step>
+  <Step title="Filter by Risk Tier">
+    Check **Critical** and/or **At Risk** to focus only on the leads that need the most immediate attention. Removing lower-risk leads reduces noise when you have a large queue.
+  </Step>
+  <Step title="Set a Deal Value minimum">
+    In the **Deal Value** field, enter a minimum threshold (for example, $10,000) to surface only the highest-value opportunities. This is useful when you have limited capacity and need to triage ruthlessly.
+  </Step>
+  <Step title="Save the filter as a view">
+    Once you've configured filters you use regularly, click **Save View**, give it a name (for example, "My Critical Deals"), and it will appear in the **Saved Views** dropdown at the top of the queue for one-click access in the future.
+  </Step>
+</Steps>
+
+## Acting on a Lead
+
+Opening a lead from the Recovery Queue takes you directly to the detail panel, which contains the full context and action controls you need to re-engage the deal.
+
+<Steps>
+  <Step title="Click the lead to open the detail panel">
+    Click anywhere on a lead card to slide open the detail panel on the right side of the screen. The lead list remains visible so you can move to the next lead without navigating away.
+  </Step>
+  <Step title="Review the health timeline">
+    The **Health Timeline** chart shows the lead's health score history over time. A declining trend tells you the deal has been drifting — a flat or recovering trend means recent actions are working.
+  </Step>
+  <Step title="Read the AI-generated risk summary">
+    Below the timeline, LeadRev displays a short AI-generated summary of why this lead is in the queue — for example, "No contact in 22 days, no next step set, deal value above $50K threshold." Use this to quickly orient yourself before taking action.
+  </Step>
+  <Step title="Choose an action">
+    Select one of the three primary actions in the activity panel:
+    - **Log Contact** — record a call, email, meeting, or other touchpoint. See [Log Contact Activities](/guides/logging-contact) for the full walkthrough.
+    - **Create Task** — schedule a future follow-up with a due date and assignee. See [Tasks and Follow-Ups](/guides/tasks-and-follow-ups) for details.
+    - **Update Stage** — move the deal forward or backward in the pipeline to reflect its current position.
+  </Step>
+  <Step title="Watch the health score recalculate">
+    After saving your action, LeadRev immediately recalculates the lead's health score. If the action satisfies the risk condition (for example, logging a contact clears the overdue flag), the lead's position in the queue updates — it may move down or drop off entirely, depending on the new score.
+  </Step>
+</Steps>
+
+## Bulk Actions
+
+When you need to act on multiple leads at once — for example, when reassigning a departing rep's book of business or mass-creating follow-up tasks after a campaign — use bulk actions to move faster.
+
+Select leads by clicking the **checkbox** in the top-left corner of each lead card. Once you've selected one or more leads, the **Bulk Actions** bar appears at the bottom of the screen. Available bulk actions include:
+
+- **Assign Owner** — reassign all selected leads to a different team member.
+- **Create Tasks** — create a task on every selected lead simultaneously. All tasks share the same title, due date, and assignee, which you configure in the bulk task form.
+- **Mark Contacted** — log a contact activity across all selected leads at once. Useful after a mass outreach event like a webinar follow-up.
+
+<Tip>
+  Work the Recovery Queue every morning before you open your email. Start with Critical-tier, highest-value leads to maximize recovery impact — these are the deals where a single re-engagement can have the biggest effect on your forecast. Spend no more than 15 minutes triaging before switching to execution.
+</Tip>
+
+## Related Resources
+
+- [Log Contact Activities](/guides/logging-contact) — detailed steps for recording calls, emails, and meetings.
+- [Tasks and Follow-Ups](/guides/tasks-and-follow-ups) — how to create, assign, and complete tasks tied to leads.
+- [Pipeline Dashboard](/guides/pipeline-dashboard) — a real-time view of total pipeline risk and leakage exposure.
+- [Recovery Queue API](/api/recovery-queue) — manage the queue programmatically.

@@ -1,0 +1,86 @@
+---
+title: "Recovery Queue: Prioritized At-Risk Lead Management"
+sidebarTitle: "Recovery Queue"
+description: "The Recovery Queue surfaces your highest-risk leads in priority order so your team can take targeted action before deals are lost for good."
+---
+
+The Recovery Queue is LeadRev's core action center — a dynamically ranked list of leads that need immediate attention, sorted by risk severity and deal value so your team always knows exactly where to focus first. Rather than asking reps to manually scan their full lead list for problems, the Recovery Queue does the triage for them: every lead that crosses a risk threshold appears here automatically, ranked and ready to work.
+
+## How Leads Enter the Queue
+
+Leads are added to the Recovery Queue automatically the moment they meet one or more risk conditions. Your team does not need to manage the queue manually — LeadRev handles entry and exit in real time based on each lead's current health score and risk signals.
+
+**A lead enters the Recovery Queue when any of the following conditions are true:**
+
+- **Overdue contact** — No touchpoint has been logged within the configured recency window (default: 14 days)
+- **No next step** — The lead has no open task or defined follow-up action
+- **Untouched since import** — The lead has never had any activity logged since it was created or imported
+- **High-value deal stalling** — The lead's deal value exceeds the high-value threshold and has seen no recent engagement
+
+**A lead leaves the Recovery Queue when its risk drops below the entry threshold**, which happens when:
+
+- A contact is logged and recency resets
+- A task is created or completed, satisfying the next-step requirement
+- The overall health score improves past the At Risk threshold
+- The lead is marked as closed, lost, or otherwise resolved
+
+## Queue Priority Logic
+
+The Recovery Queue is not a flat list — every lead's position reflects both how urgent its situation is and how much revenue is at stake if the deal is lost.
+
+Leads are ranked using a two-level sort:
+
+1. **Risk tier first** — Critical-tier leads (score 0–39) always appear above At Risk leads (score 40–69), regardless of deal value
+2. **Deal value second** — Within each tier, leads are sorted from highest to lowest deal value so the highest-revenue opportunities get first attention
+
+<Note>
+  **Queue rank formula (conceptual):**
+
+  ```text
+  Queue Position = sort(Risk Tier DESC, deal_value DESC)
+  ```
+
+  Critical tier leads are always prioritized above At Risk leads. Within each tier, a $100,000 stalled deal will always rank above a $5,000 stalled deal.
+</Note>
+
+This ranking ensures that your team's first actions each day target the highest-impact recovery opportunities. A low-value At Risk lead will never displace a high-value Critical lead from the top of the queue.
+
+## Working the Queue
+
+Follow these steps to move through the Recovery Queue efficiently and return at-risk leads to a healthy state.
+
+<Steps>
+  <Step title="Open the Recovery Queue">
+    Select **Recovery Queue** from the left sidebar. The queue loads with your highest-priority leads at the top, filtered to show all leads you own (or all leads if you have manager-level access).
+  </Step>
+  <Step title="Click a lead to open its detail panel">
+    Select any lead in the queue to open its full detail panel on the right. Here you can see the lead's current health score, risk tier, the specific flags that triggered its queue entry, and a full activity timeline.
+  </Step>
+  <Step title="Review the health score and last activity">
+    Check the health score breakdown to understand which signals are driving the risk. Review the most recent activity in the timeline to get context on where the conversation left off before you reach out.
+  </Step>
+  <Step title="Log a contact or create a task">
+    Take action directly from the detail panel. Select **Log Contact** to record a call, email, or meeting — or select **Create Task** to set a next step with a due date. Either action triggers an immediate health score recalculation.
+  </Step>
+  <Step title="Queue position refreshes automatically">
+    After you log activity, LeadRev recalculates the lead's health score in real time. If the score improves past the recovery threshold, the lead exits the queue automatically. If it remains at risk, its position in the queue updates to reflect the new score.
+  </Step>
+</Steps>
+
+## Filtering and Sorting
+
+If your organization has a large pipeline, use the queue's filtering tools to focus on the segment of leads most relevant to your role or review session.
+
+**Available filters:**
+
+- **Owner** — Filter to leads assigned to a specific rep or yourself
+- **Pipeline Stage** — Show only leads in a particular stage (e.g., Proposal, Negotiation)
+- **Risk Tier** — Narrow the view to Critical-only or At Risk-only leads
+- **Deal Value Range** — Set a minimum and/or maximum deal value to focus on a specific revenue band
+- **Date Added to Queue** — Filter by when the lead first entered the queue to prioritize newer entries or find long-stalled leads
+
+You can combine any number of filters and save the resulting view for quick access. Saved filter views appear in the left sidebar under **Recovery Queue**, making it easy for reps and managers to return to their preferred queue configuration without re-applying filters each session.
+
+<Tip>
+  Ready to go deeper? The [Working the Recovery Queue](/guides/working-recovery-queue) guide walks through a full rep workflow — from opening the queue at the start of a day to closing out your highest-risk leads before end of shift.
+</Tip>

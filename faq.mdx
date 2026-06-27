@@ -1,0 +1,114 @@
+---
+title: "LeadRev FAQ: Leads, Health Scoring, and Recovery Queue"
+sidebarTitle: "FAQ"
+description: "Answers to common questions about importing leads, risk scoring, the Recovery Queue, integrations, billing, and account management in LeadRev."
+---
+
+Here are answers to the most common questions about using LeadRev. If you don't find what you're looking for, reach out to support through the in-app chat or at support@leadrev.ai.
+
+<AccordionGroup>
+
+  <Accordion title="How does LeadRev calculate the health score?">
+    LeadRev calculates each lead's health score on a scale of 0 to 100 using a weighted combination of signals:
+
+    - **Contact recency** — the primary factor. The longer since the last logged contact activity, the lower the score.
+    - **Next step status** — leads without a next step set incur a penalty based on the no-next-step severity you've configured (Low, Medium, or High).
+    - **Deal value** — leads above your High Value Threshold receive a risk multiplier that amplifies penalties.
+    - **Stage progression** — leads that have been in the same stage for an unusually long time relative to your average sales cycle accrue additional risk weight.
+
+    Scores update automatically within two minutes of any activity being logged, a task being created, or a threshold being changed. A score of 70 or above is Healthy; 40–69 is At Risk; below 40 is Critical.
+  </Accordion>
+
+  <Accordion title="What happens to existing leads when I change risk thresholds?">
+    Changing any risk threshold — whether the At Risk contact recency window, the Critical window, the leakage period, the no-next-step severity, or a stage-specific rule — triggers an immediate re-evaluation of all leads in your workspace. Health scores are recalculated and risk tiers are reassigned within minutes.
+
+    This means your Recovery Queue may grow or shrink right after a threshold change. Leads that were Healthy under the old settings may become At Risk, and vice versa. Communicate threshold changes to your team before making them so the shift in queue size doesn't cause confusion.
+  </Accordion>
+
+  <Accordion title="Can I import leads from a CRM without a native integration?">
+    Yes. If your CRM isn't Salesforce or HubSpot, or if you'd prefer a one-time bulk import, you can use the CSV import feature. Download the LeadRev import template from **Leads → Import → Download Template**, populate it with your data, and upload the file.
+
+    The required fields are `name`, `owner`, and `stage`. Optional fields include `email`, `company`, `deal_value`, `last_contact_date`, and any custom fields you've configured. Dates must be formatted as `YYYY-MM-DD`. See the [Importing Leads guide](/importing-leads) for the full field reference.
+  </Accordion>
+
+  <Accordion title="How do I remove a lead from the Recovery Queue?">
+    A lead exits the Recovery Queue automatically when its health score rises back above the At Risk threshold. The most reliable way to move a lead out of the queue is to log a contact activity — a call, email, or meeting — which resets the contact recency clock and triggers a health score recalculation.
+
+    You can also set a next step on the lead, which removes the no-next-step penalty and improves the score. If the lead has been fully qualified out or is no longer relevant, you can mark it as **Closed Lost** or **Disqualified** from the lead detail page, which removes it from the active queue entirely.
+  </Accordion>
+
+  <Accordion title="Who can see my pipeline data?">
+    Visibility depends on your workspace role:
+
+    - **Admins** can see all leads, all pipeline metrics, and all Recovery Queue entries across the entire workspace.
+    - **Managers** can see all leads and metrics within their assigned team.
+    - **Representatives** can see only the leads assigned to them by default. Admins can grant individual reps broader visibility if needed.
+
+    Pipeline-level reports and leakage metrics are visible to Admins and Managers. Representatives see only their own contribution to those metrics unless their access has been expanded.
+  </Accordion>
+
+  <Accordion title="Does LeadRev send emails or make calls on my behalf?">
+    No. LeadRev is a revenue intelligence and tracking platform — it does not send emails, make calls, or take any outbound action with your leads on your behalf. When you log a call or email in LeadRev, you are recording that an activity occurred, not initiating it through LeadRev.
+
+    If your LeadRev workspace is connected to HubSpot, logged activities are synced to the HubSpot timeline as engagement records, but the outreach itself is always initiated by you through your existing tools.
+  </Accordion>
+
+  <Accordion title="Can I customize the pipeline stages?">
+    Yes. Workspace Admins can add, rename, reorder, and remove pipeline stages in **Settings → Pipeline → Stages**. Each stage has a name and a position in the funnel.
+
+    Note that removing a stage will move any leads currently in that stage to the stage you designate as the replacement. You can also configure stage-specific risk thresholds (see [Risk Thresholds](/configuration/risk-thresholds)) so that different stages have different contact recency windows.
+  </Accordion>
+
+  <Accordion title="What is the difference between 'At Risk' and 'Leakage'?">
+    **At Risk** is a real-time risk tier. A lead is At Risk when it has not had a logged contact activity within your configured At Risk threshold (default: 14 days). It's a warning signal — the lead needs attention but can still be recovered.
+
+    **Leakage** is a revenue accounting metric. A lead counts as revenue leakage when it has remained in the **Critical** tier (the most severe risk tier) for longer than your configured leakage window (default: 30 days in Critical) without any meaningful engagement. Leakage represents deals that have effectively gone cold and are likely lost, and it rolls up into the **Pipeline at Risk** figure on your dashboard.
+
+    In short: At Risk is a prompt to act; Leakage is what happens when you don't.
+  </Accordion>
+
+  <Accordion title="How do I delete a lead?">
+    To delete a lead, open the lead's detail page, click the **Actions** menu (the three-dot icon in the top-right of the lead header), and select **Delete Lead**. You will be asked to confirm the deletion.
+
+    Deleting a lead is permanent and removes all associated tasks, contact activity history, and notes. If you want to preserve the record but stop tracking it, consider marking it **Closed Lost** or **Disqualified** instead — this removes it from the active Recovery Queue while keeping the history intact.
+
+    Only Admins and the lead's assigned owner can delete a lead. Admins can delete any lead in the workspace.
+  </Accordion>
+
+  <Accordion title="Is there a mobile app?">
+    LeadRev does not currently have a native iOS or Android app. The web application is fully responsive and optimized for mobile browsers, so you can access your Recovery Queue, log contact activities, and manage tasks from any mobile device without installing anything.
+
+    A native mobile app is on the LeadRev product roadmap. If mobile access is important to your team, let the LeadRev team know through the in-app feedback widget — it helps prioritize the roadmap.
+  </Accordion>
+
+  <Accordion title="How do I invite teammates to my workspace?">
+    Go to **Settings → Team → Members** and click **Invite Member**. Enter your teammate's work email address, select their role (Admin, Manager, or Representative), and click **Send Invite**.
+
+    They will receive an email with a link to create their LeadRev account and join your workspace. Invitations expire after 72 hours. If a teammate didn't receive the invite or it expired, you can resend it from the same **Members** page.
+
+    The number of seats available depends on your subscription plan. If you've reached your seat limit, you'll be prompted to upgrade before sending additional invites.
+  </Accordion>
+
+  <Accordion title="How does LeadRev billing work?">
+    LeadRev is billed on a per-seat, per-month basis. Each team member you invite to your workspace consumes one seat. You are charged only for active seats — if you remove a member mid-cycle, the unused portion of that seat is credited to your next billing period.
+
+    **Plan tiers** determine the features available to your workspace:
+
+    - **Starter** — up to 5 seats, core health scoring, Recovery Queue, CSV import, and email notifications.
+    - **Growth** — up to 25 seats, all Starter features plus CRM integrations (Salesforce and HubSpot), Slack notifications, and stage-specific risk rules.
+    - **Business** — unlimited seats, all Growth features plus webhooks, API access, workspace-level alerts, and priority support.
+
+    To view your current plan, seat usage, and billing history, go to **Settings → Billing**. Only workspace Admins can view or change billing information.
+
+    To upgrade your plan or add seats, click **Upgrade** on the Billing page or contact the LeadRev sales team at sales@leadrev.ai. Downgrades take effect at the end of the current billing cycle — you retain access to your current plan's features until then.
+  </Accordion>
+
+  <Accordion title="What is the API rate limit?">
+    The default API rate limit is **60 requests per minute** per API key. If you exceed this limit, the API returns a `429 Too Many Requests` response.
+
+    The response includes a `Retry-After` header indicating how many seconds to wait before retrying. Implement exponential backoff in your integration to handle rate limit responses gracefully.
+
+    If your use case requires a higher rate limit — for example, a bulk sync or a high-frequency automation — contact LeadRev support at support@leadrev.ai to discuss a limit increase for your workspace.
+  </Accordion>
+
+</AccordionGroup>

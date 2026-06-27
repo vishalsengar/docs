@@ -1,0 +1,186 @@
+---
+title: "Recovery Queue API: Prioritized At-Risk Lead Endpoints"
+sidebarTitle: "Recovery Queue"
+description: "API endpoints for retrieving your prioritized Recovery Queue of at-risk and critical leads, with aggregate summary stats including total value at risk."
+---
+
+The Recovery Queue endpoint returns your workspace's live prioritized list of leads that require immediate attention, sorted by risk tier (Critical first) then by deal value (highest first). Use these endpoints to power custom dashboards, automated alerts, or daily stand-up digests for your revenue team.
+
+---
+
+## GET /v1/recovery-queue — Get Recovery Queue
+
+Returns the ordered list of leads currently in your Recovery Queue. Leads enter the queue automatically when their health score drops below your workspace's configured threshold. The response is sorted by risk severity — Critical leads appear before At Risk leads — and by deal value descending within each tier.
+
+<Note>
+  The Recovery Queue reflects your live workspace state. A lead's `queue_position` may change between requests as other leads are added, updated, or removed from the queue.
+</Note>
+
+### Query Parameters
+
+<ParamField query="page" type="integer">
+  The page number to return. Defaults to `1`.
+</ParamField>
+
+<ParamField query="per_page" type="integer">
+  The number of leads to return per page. Defaults to `50`. Maximum is `100`.
+</ParamField>
+
+<ParamField query="risk_tier" type="string">
+  Filter the queue to a specific risk tier. Accepted values: `at_risk` or `critical`.
+</ParamField>
+
+<ParamField query="owner" type="string">
+  Filter results to leads owned by a specific team member, identified by their email address.
+</ParamField>
+
+<ParamField query="min_deal_value" type="number">
+  Only return leads with a `deal_value` greater than or equal to this amount (in USD). Useful for focusing on high-value deals first.
+</ParamField>
+
+<ParamField query="stage" type="string">
+  Filter results to leads in a specific pipeline stage. Must match your workspace's configured stage names exactly.
+</ParamField>
+
+### Response Fields
+
+<ResponseField name="id" type="string">
+  The unique LeadRev identifier for this lead.
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  The lead or company name.
+</ResponseField>
+
+<ResponseField name="owner" type="string">
+  Email address of the team member responsible for this lead.
+</ResponseField>
+
+<ResponseField name="stage" type="string">
+  The current pipeline stage name.
+</ResponseField>
+
+<ResponseField name="deal_value" type="number">
+  The expected deal value in USD.
+</ResponseField>
+
+<ResponseField name="health_score" type="integer">
+  The lead's overall health score from 0–100 at the time of this response.
+</ResponseField>
+
+<ResponseField name="risk_tier" type="string">
+  The lead's risk classification: `at_risk` or `critical`.
+</ResponseField>
+
+<ResponseField name="days_since_contact" type="integer">
+  The number of days elapsed since the most recent logged contact activity on this lead.
+</ResponseField>
+
+<ResponseField name="next_step" type="string">
+  Description of the next planned follow-up action, if one exists.
+</ResponseField>
+
+<ResponseField name="queue_position" type="integer">
+  The lead's current rank in the Recovery Queue. Position `1` is the highest priority lead.
+</ResponseField>
+
+<ResponseField name="queue_entry_date" type="string">
+  ISO 8601 date when this lead entered the Recovery Queue.
+</ResponseField>
+
+<CodeGroup>
+
+```bash cURL
+curl -G https://api.leadrev.ai/v1/recovery-queue \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  --data-urlencode "risk_tier=critical" \
+  --data-urlencode "min_deal_value=10000" \
+  --data-urlencode "per_page=10"
+```
+
+```json Response
+{
+  "data": [
+    {
+      "id": "lead_8fKz2mQp",
+      "name": "Acme Corp",
+      "owner": "sarah@yourcompany.com",
+      "stage": "Proposal",
+      "deal_value": 48000,
+      "health_score": 28,
+      "risk_tier": "critical",
+      "days_since_contact": 46,
+      "next_step": "Send revised pricing deck",
+      "queue_position": 1,
+      "queue_entry_date": "2024-11-01"
+    },
+    {
+      "id": "lead_3nWx9rTv",
+      "name": "Globex Industries",
+      "owner": "james@yourcompany.com",
+      "stage": "Discovery",
+      "deal_value": 22500,
+      "health_score": 24,
+      "risk_tier": "critical",
+      "days_since_contact": 39,
+      "next_step": "Schedule technical demo",
+      "queue_position": 2,
+      "queue_entry_date": "2024-11-08"
+    }
+  ],
+  "meta": {
+    "page": 1,
+    "per_page": 10,
+    "total": 2,
+    "total_pages": 1
+  }
+}
+```
+
+</CodeGroup>
+
+---
+
+## GET /v1/recovery-queue/summary — Get Queue Summary
+
+Returns aggregate statistics about your current Recovery Queue. Use this endpoint to display a high-level revenue risk summary on dashboards or in executive reports without fetching the full lead list.
+
+### Response Fields
+
+<ResponseField name="total_leads_in_queue" type="integer">
+  The total number of leads currently in the Recovery Queue across all risk tiers.
+</ResponseField>
+
+<ResponseField name="total_value_at_risk" type="number">
+  The combined `deal_value` (in USD) of all leads currently in the Recovery Queue.
+</ResponseField>
+
+<ResponseField name="critical_count" type="integer">
+  The number of leads in the queue with a `risk_tier` of `critical`.
+</ResponseField>
+
+<ResponseField name="at_risk_count" type="integer">
+  The number of leads in the queue with a `risk_tier` of `at_risk`.
+</ResponseField>
+
+<Warning>
+  `total_value_at_risk` reflects the sum of `deal_value` fields as entered — it is not discounted by probability or weighted by stage. For a probability-adjusted view, use the `/v1/pipeline` endpoint.
+</Warning>
+
+<CodeGroup>
+
+```bash cURL
+curl https://api.leadrev.ai/v1/recovery-queue/summary \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```json Response
+{
+  "total_leads_in_queue": 18,
+  "total_value_at_risk": 412500,
+  "critical_count": 7,
+  "at_risk_count": 11
+}
+```
+
+</CodeGroup>

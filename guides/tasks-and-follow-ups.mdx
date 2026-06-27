@@ -1,0 +1,120 @@
+---
+title: "Create and Manage Follow-Up Tasks on Leads in LeadRev"
+sidebarTitle: "Tasks"
+description: "Create follow-up tasks on leads in LeadRev to schedule reminders, assign work to teammates, and ensure no deal falls through the cracks."
+---
+
+Tasks in LeadRev are time-bound reminders tied to a specific lead. When a task is due, it surfaces at the top of the assignee's task list and can trigger an email or in-app notification, keeping follow-ups on schedule and ensuring that every commitment made on a call translates into a concrete action item. Unlike contact logs — which record what already happened — tasks drive what happens next.
+
+## Creating a Task
+
+<Steps>
+  <Step title="Open the lead's detail panel">
+    Navigate to the lead from the **Recovery Queue**, the **Leads** list, or any dashboard widget. Click the lead name to open the detail panel.
+  </Step>
+  <Step title="Click Create Task">
+    In the activity panel, click **Create Task**. A task form appears above the activity timeline.
+  </Step>
+  <Step title="Enter the task title">
+    Write a clear, action-oriented title that tells the assignee exactly what to do — for example, "Send follow-up email with pricing" or "Schedule Q4 renewal call." Avoid vague titles like "Follow up" that require additional context to act on.
+  </Step>
+  <Step title="Set the due date and time">
+    Choose a due date and, optionally, a specific time. The due date determines when the task appears in the **Today** tab of the task list and when overdue notifications fire.
+  </Step>
+  <Step title="Assign the task">
+    Assign the task to yourself or search for a teammate by name or email. The assignee receives a notification when the task is created and a reminder when it comes due.
+  </Step>
+  <Step title="Add optional notes">
+    Use the notes field to provide context the assignee will need — for example, what was discussed on the last call, what objection was raised, or which materials to attach. Good task notes mean the assignee can act immediately without hunting for context.
+  </Step>
+  <Step title="Click Save">
+    Click **Save** to create the task. It appears immediately in the lead's activity timeline and in the assignee's task list under the appropriate tab (Today, Upcoming, or Overdue, depending on the due date).
+  </Step>
+</Steps>
+
+## Viewing Your Tasks
+
+Click **Tasks** in the left sidebar to open the full task list view. Your tasks are organized into three tabs:
+
+- **Today** — tasks due today. Work through this list at the start of each day before opening your email.
+- **Upcoming** — tasks due in the future, sorted by due date ascending. Use this to plan your week and spot upcoming spikes in workload.
+- **Overdue** — tasks whose due date has passed and that are still incomplete. Overdue tasks are a risk signal — address them as soon as possible.
+
+Each task row in the list shows:
+
+- **Lead Name** — the lead the task is associated with. Click to open the lead detail panel.
+- **Task Title** — the description of what needs to be done.
+- **Due Date** — when the task is due, with relative labels ("Today", "Tomorrow", "2 days ago") for quick scanning.
+- **Assignee** — who is responsible for completing the task (relevant for managers viewing team tasks).
+
+## Completing a Task
+
+Mark a task complete by clicking the **checkbox** to the left of the task title — either in the task list view or in the lead's activity timeline on the detail panel. The task moves to the completed state, disappears from the active tabs, and is archived in the lead's timeline with a completion timestamp.
+
+Completing a task triggers a health score recalculation for the associated lead. If the task was the only outstanding risk signal, the lead may move out of the Recovery Queue entirely.
+
+<Tip>
+  Add a note when completing a task to record the outcome — for example, "Left voicemail, will try again Thursday" or "Sent proposal, prospect confirmed receipt." This keeps the activity timeline useful as a record of what actually happened, not just what was planned.
+</Tip>
+
+## Task Notifications
+
+LeadRev notifies task assignees at two moments:
+
+1. **When a task is assigned** — the assignee receives a notification (email, in-app, or both) as soon as the task is saved. This ensures new tasks don't go unnoticed, especially when a manager creates tasks on behalf of a rep.
+2. **When a task becomes overdue** — if a task passes its due date without being completed, LeadRev sends an overdue notification to the assignee. Overdue notifications fire once daily for as long as the task remains incomplete.
+
+To configure which notification channels are active for your account — and to set quiet hours or digest preferences — visit [Settings → Notifications](/configuration/notifications).
+
+## Creating Tasks via API
+
+You can create tasks programmatically via the LeadRev API to integrate with external project management tools, CRMs, or automation workflows. See [API: Tasks](/api/tasks) for the full reference.
+
+<CodeGroup>
+```bash curl
+curl --request POST \
+  --url https://api.leadrev.io/v1/tasks \
+  --header 'Authorization: Bearer YOUR_API_KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "lead_id": "lead_abc123",
+    "title": "Send proposal deck",
+    "due_date": "2024-11-20",
+    "assignee": "jane@company.com",
+    "notes": "Include Q4 pricing options"
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.leadrev.io/v1/tasks', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    lead_id: 'lead_abc123',
+    title: 'Send proposal deck',
+    due_date: '2024-11-20',
+    assignee: 'jane@company.com',
+    notes: 'Include Q4 pricing options',
+  }),
+});
+
+const task = await response.json();
+console.log(task);
+```
+</CodeGroup>
+
+A successful request returns a `201 Created` response with the created task object, including the task ID, assignee, and the lead's updated health score.
+
+<Warning>
+  Overdue tasks count as a risk signal in LeadRev's health scoring model. Every incomplete task past its due date pushes the associated lead toward a higher risk tier. A backlog of overdue tasks can rapidly move leads from Healthy into the Recovery Queue — complete or reschedule overdue tasks promptly to keep your pipeline health score accurate.
+</Warning>
+
+## Related Resources
+
+- [Log Contact Activities](/guides/logging-contact) — record the actual touchpoints that accompany your tasks.
+- [Working the Recovery Queue](/guides/working-recovery-queue) — use tasks to drive re-engagement on at-risk deals.
+- [API: Tasks](/api/tasks) — full API reference for creating and managing tasks programmatically.
+- [Settings → Notifications](/configuration/notifications) — configure how and when task alerts are delivered.

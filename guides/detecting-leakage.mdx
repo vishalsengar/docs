@@ -1,0 +1,65 @@
+---
+title: "Detect and Address Revenue Leakage in Your Pipeline"
+sidebarTitle: "Detect Leakage"
+description: "Use LeadRev's leakage detection to identify high-value deals with no recent engagement and quantify the revenue your team is at risk of losing."
+---
+
+Revenue leakage detection in LeadRev continuously scans your pipeline for deals in the Critical risk tier that have had no contact or task activity within the configured leakage window. When a high-value deal goes dark, LeadRev surfaces it automatically so your team can re-engage before the opportunity is lost — and gives you a dollar figure attached to the silence.
+
+## Viewing Leakage Exposure
+
+<Steps>
+  <Step title="Navigate to the Pipeline section">
+    Click **Pipeline** in the left sidebar to open the pipeline overview.
+  </Step>
+  <Step title="Select the Revenue Leakage tab">
+    At the top of the Pipeline page, click the **Revenue Leakage** tab to switch from the standard pipeline view to the leakage-focused report.
+  </Step>
+  <Step title="Review the total leakage value">
+    At the top of the page, LeadRev displays the aggregate dollar value of all leads currently flagged for leakage. This number represents the total deal value your team has not touched within the leakage window.
+  </Step>
+  <Step title="Scroll through the leakage lead list">
+    Below the summary, the leakage lead list loads all qualifying deals sorted by deal value in descending order. The largest at-risk opportunities appear first so you can act on them immediately.
+  </Step>
+</Steps>
+
+## Understanding the Leakage List
+
+Each row in the leakage table represents a single deal that meets the leakage criteria. The columns give you everything you need to assess urgency at a glance.
+
+| Column | Description |
+|---|---|
+| **Lead Name** | The name of the lead or account. Click to open the full lead detail view. |
+| **Owner** | The team member currently assigned to this lead. |
+| **Stage** | The current pipeline stage — useful for understanding how far along the deal is. |
+| **Deal Value** | The total opportunity value in your configured currency. |
+| **Days Since Contact** | How many days have passed since the last logged contact activity or completed task. |
+| **Risk Tier** | The lead's current risk classification: Critical, At Risk, or Healthy. |
+
+Leads in the Critical risk tier display a red **Leakage** badge next to the lead name. This badge clears automatically once a contact activity is logged and the lead's last contact date falls within the leakage window.
+
+## Taking Action on Leaking Deals
+
+You have two paths to re-engage a leaking deal directly from the leakage view.
+
+**(a) Log a contact from the lead detail view.** Click the lead name to open the detail panel. From there, click **Log Contact** in the activity panel, record the touchpoint, and save. LeadRev immediately updates the lead's last contact date, recalculates the health score, and removes the leakage flag if the cadence threshold is met. For full logging instructions, see [Log Contact Activities](/guides/logging-contact).
+
+**(b) Bulk-assign leads to a team member.** Check the boxes next to multiple leads in the leakage list, then click **Bulk Actions → Assign Owner** to route them to the right rep in a single action. This is especially useful when a rep transitions off a book of business or when you want to redistribute a backlog quickly.
+
+<Tip>
+  Sort the leakage list by **Deal Value** (high to low) before you start working through it. Recovering one high-value deal can offset the risk from dozens of smaller ones — prioritize the largest dollars first.
+</Tip>
+
+## Adjusting the Leakage Window
+
+The default leakage window is **30 days** — any Critical-tier lead with no contact or task activity in the past 30 days is flagged. If your sales cycle is longer or shorter than average, you can tune this threshold to match your team's cadence.
+
+To change the window, go to [Settings → Risk Thresholds](/configuration/risk-thresholds) and update the **No-Contact Leakage Window** field. Changes take effect immediately and retroactively update the leakage list on the next scan cycle (every hour).
+
+<Note>
+  Schedule a weekly leakage review as part of your pipeline cadence — for example, every Monday morning before your team standup. Reviewing the leakage list on a fixed schedule ensures no deal goes dark for more than one week beyond the threshold, and it gives revenue leaders a consistent pulse on exposure before it becomes a forecast problem.
+</Note>
+
+## Next Steps
+
+Once you've identified leaking deals, work through them systematically using the [Recovery Queue](/guides/working-recovery-queue). For a broader view of pipeline health and at-risk value, see the [Pipeline Dashboard](/guides/pipeline-dashboard). To understand how LeadRev calculates pipeline risk, visit [Pipeline Risk](/concepts/pipeline-risk).

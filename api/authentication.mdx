@@ -1,0 +1,128 @@
+---
+title: "API Authentication: API Keys and Bearer Tokens in LeadRev"
+sidebarTitle: "Authentication"
+description: "Generate an API key in the LeadRev dashboard and pass it as a Bearer token to authenticate all requests to the LeadRev REST API securely."
+---
+
+LeadRev uses API keys to authenticate requests. Every request to the API must include your API key in the `Authorization` header as a Bearer token. API keys are scoped to your workspace and respect your user role permissions — a key created under a read-only team member's account cannot write data, for example. Keep your keys secure and rotate them regularly to limit exposure.
+
+## Generating an API Key
+
+<Steps>
+  <Step title="Log in to LeadRev">
+    Open your browser and go to [app.leadrev.ai](https://app.leadrev.ai). Sign in with your credentials.
+  </Step>
+  <Step title="Open API Keys settings">
+    Click your avatar in the top-right corner, then navigate to **Settings → API Keys**.
+  </Step>
+  <Step title="Generate a new key">
+    Click **Generate New Key** to open the key creation dialog.
+  </Step>
+  <Step title="Name your key">
+    Enter a descriptive name that identifies the integration — for example, `Production Integration` or `Data Warehouse Sync`. A clear name makes it easier to audit and revoke keys later.
+  </Step>
+  <Step title="Copy and store the key securely">
+    Copy the key immediately and store it in a secrets manager or environment variable. LeadRev will **not** display the full key again after you close this dialog.
+  </Step>
+</Steps>
+
+## Making Authenticated Requests
+
+Pass your API key in the `Authorization` header using the `Bearer` scheme on every request. There are no session cookies or OAuth flows — the key itself is the credential.
+
+**Header format:**
+
+```bash
+Authorization: Bearer YOUR_API_KEY
+```
+
+**cURL example:**
+
+```bash
+curl https://api.leadrev.ai/v1/leads \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+**JavaScript fetch example:**
+
+```javascript
+const response = await fetch('https://api.leadrev.ai/v1/leads', {
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  }
+});
+const data = await response.json();
+```
+
+<Note>
+  Replace `YOUR_API_KEY` with the actual key you copied from the dashboard. Never hard-code a real key in source files — use an environment variable such as `process.env.LEADREV_API_KEY` instead.
+</Note>
+
+## API Key Scopes
+
+API keys inherit the permissions of the user who created them. To issue a restricted key, generate it while logged in as a team member with the appropriate role. The effective scope of a key maps to the following access levels:
+
+| Scope | What it allows |
+|-------|----------------|
+| `read` | Access to all `GET` endpoints. Cannot create, update, or delete any resource. |
+| `write` | Access to `GET`, `POST`, and `PATCH` endpoints. Use this for integrations that need to import leads or log activities. |
+| `admin` | Full access to all endpoints, including destructive `DELETE` operations and workspace-level settings. |
+
+<Info>
+  Create separate keys for each integration and assign the minimum scope required. If an integration only reads pipeline data, give it a `read`-scoped key — not an `admin` one.
+</Info>
+
+## Revoking a Key
+
+Revoke a key immediately if it is compromised, no longer needed, or you are rotating credentials.
+
+<Steps>
+  <Step title="Open API Keys settings">
+    In the LeadRev dashboard, click your avatar → **Settings → API Keys**.
+  </Step>
+  <Step title="Find the key">
+    Locate the key you want to revoke in the list. Use the name you gave it during creation to identify it quickly.
+  </Step>
+  <Step title="Click Revoke">
+    Click the **Revoke** button next to the key.
+  </Step>
+  <Step title="Confirm revocation">
+    Confirm the action in the dialog. The key is invalidated instantly — any request made with a revoked key returns `401 Unauthorized` immediately.
+  </Step>
+</Steps>
+
+## Security Best Practices
+
+Protecting your API keys is critical to keeping your LeadRev workspace secure. Follow these practices for every integration you build:
+
+- **Never expose API keys in client-side code.** Keys embedded in browser JavaScript or mobile apps can be extracted by anyone.
+- **Never commit keys to version control.** A key pushed to a public repository should be considered compromised and revoked immediately.
+- **Use environment variables.** Store keys in environment variables or a dedicated secrets manager (such as AWS Secrets Manager, HashiCorp Vault, or Doppler) rather than in configuration files.
+- **Rotate keys periodically.** Generate a replacement key, update your integration, then revoke the old key on a regular schedule.
+- **Create a separate key per integration.** Isolation limits the blast radius if one key is leaked — you can revoke only that key without disrupting other integrations.
+- **Revoke unused keys.** Audit your key list regularly and revoke any key that is no longer in active use.
+
+## Error Responses
+
+If authentication fails, the API returns one of the following errors:
+
+**`401 Unauthorized`** — The `Authorization` header is missing, malformed, or contains an invalid or revoked key. Verify that you are passing the header correctly as `Bearer YOUR_KEY` and that the key has not been revoked.
+
+**`403 Forbidden`** — The key is valid but the key owner does not have permission to access the requested resource. Check that the key was created by a user with the required role and scope for that endpoint.
+
+**Example 401 response:**
+
+```json
+{
+  "error": {
+    "code": "UNAUTHORIZED",
+    "message": "Invalid or missing API key. Pass your key in the Authorization header as: Bearer YOUR_KEY",
+    "status": 401
+  }
+}
+```
+
+<Warning>
+  Never commit API keys to version control. If a key is accidentally pushed to a repository — public or private — revoke it immediately and generate a new one. Use environment variables or a secrets manager to keep credentials out of your codebase.
+</Warning>

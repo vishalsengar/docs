@@ -1,0 +1,80 @@
+---
+title: "Pipeline Risk and Revenue Leakage Detection in LeadRev"
+sidebarTitle: "Pipeline Risk"
+description: "Understand how LeadRev measures pipeline at risk and revenue leakage exposure from stalled, overdue, and untouched deals in your pipeline."
+---
+
+Pipeline risk is the aggregate deal value across all At Risk and Critical-tier leads in your pipeline — the total revenue that is currently in danger of being lost due to stalled engagement, missing next steps, or extended inactivity. Revenue leakage is a more urgent subset of that number: the portion of pipeline risk attributable to deals that have shown no engagement signals whatsoever for an extended period. Leaking deals are not just at risk — they are effectively being lost in real time if no action is taken. Together, these two metrics give your team and leadership a clear, dollar-denominated picture of what inaction is costing your organization.
+
+## Pipeline at Risk
+
+Pipeline at risk is the simplest and most direct measure of exposure in your current pipeline. LeadRev calculates it by summing the deal value of every lead in the At Risk or Critical risk tier at the time of the calculation.
+
+```text
+Pipeline at Risk = Σ deal_value (At Risk leads) + Σ deal_value (Critical leads)
+```
+
+This figure updates in real time as leads move between tiers. When a rep logs a contact and a Critical lead recovers to Healthy, that deal's value is immediately subtracted from the pipeline at risk total. Conversely, when a previously healthy lead crosses a risk threshold, its value is added.
+
+Pipeline at risk is visible on the Pipeline Dashboard as a headline metric and can be broken down by owner, stage, or team for leadership reviews. Use this number to answer the question: *"How much revenue is currently at risk of falling out of the pipeline entirely?"*
+
+## Revenue Leakage
+
+Revenue leakage goes a step further than pipeline at risk. A leaking deal is one in the Critical tier that has also passed the leakage window — the configured number of days with no logged contact and no open task (default: 30 days of combined inactivity).
+
+Where an At Risk lead is drifting, a leaking deal is already falling. Leakage represents the revenue you are most likely to permanently lose if your team does not act in the immediate term. These deals have typically exhausted their recency window by a significant margin, have no evidence of ongoing pursuit, and in many cases may already have gone to a competitor.
+
+LeadRev flags leaking deals with a **Revenue Leakage** badge in the Recovery Queue and surfaces the total leakage exposure as a separate metric on the Pipeline Dashboard, distinct from the broader pipeline at risk figure.
+
+## Leakage vs. At Risk
+
+Understanding the distinction between pipeline at risk and revenue leakage helps your team prioritize correctly and communicate the right urgency to leadership.
+
+<Tabs>
+  <Tab title="Pipeline at Risk">
+    **Definition:** The total deal value of all leads in the At Risk or Critical risk tier.
+
+    **Urgency level:** Medium to High — these deals need attention, but most are still recoverable with prompt outreach.
+
+    **Primary use:** Quantify the cost of current inaction for pipeline reviews and leadership reporting. Use it to make the case for rep capacity, prioritization decisions, or process improvements.
+
+    **Typical lead profile:**
+    - Health score between 0 and 69
+    - Contact overdue, next step missing, or stage age elevated
+    - Still within a reasonable recovery window
+
+    **Recovery likelihood:** High for At Risk leads with prompt action; moderate for Critical leads depending on recency.
+  </Tab>
+  <Tab title="Revenue Leakage">
+    **Definition:** The total deal value of Critical-tier leads that have also passed the leakage inactivity window (default: 30 days with no contact and no task).
+
+    **Urgency level:** Critical — these deals are actively being lost and require emergency outreach now.
+
+    **Primary use:** Identify which specific deals to target for immediate recovery before they become unrecoverable. Use it to drive emergency sprint lists or escalation conversations.
+
+    **Typical lead profile:**
+    - Health score between 0 and 39
+    - No contact logged in 30+ days
+    - No open task or next step of any kind
+    - May have been untouched since import
+
+    **Recovery likelihood:** Low without immediate action; still recoverable but window is closing.
+  </Tab>
+</Tabs>
+
+## How to Use This Data
+
+Pipeline risk and revenue leakage data serve different audiences and different decisions within your organization.
+
+**For sales reps and team leads:**
+Use the revenue leakage figure to build your emergency outreach list for the day. Every deal flagged as leaking is a deal where a single well-timed touchpoint could be the difference between recovery and permanent loss. Sort the Recovery Queue by leakage status to bring these deals to the top and work them before anything else.
+
+**For sales managers and revenue leaders:**
+Use pipeline at risk as a standing agenda item in pipeline reviews. A rising pipeline at risk number signals a systemic engagement gap — either reps are not logging activity, next steps are not being set consistently, or your cadence is too slow for your average deal cycle. Leakage totals, tracked week-over-week, show whether intervention efforts are working or whether revenue is continuing to drain from the pipeline.
+
+**For executive and board reporting:**
+Pipeline at risk and revenue leakage provide a dollar-denominated measure of the risk your current pipeline carries. These figures contextualize your forecast accuracy and give leadership visibility into the gap between your pipeline on paper and the pipeline that is actively being pursued.
+
+<Note>
+  The Pipeline Dashboard brings these metrics together in a single view, with breakdowns by owner, stage, and time period. See the [Pipeline Dashboard Guide](/guides/pipeline-dashboard) for a full walkthrough of the available charts, filters, and export options.
+</Note>
